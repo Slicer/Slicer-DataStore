@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DataStoreGUI</class>
+ <widget class="QWidget" name="DataStoreGUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1159</width>
+    <height>752</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>2</number>
+     </property>
+     <widget class="QWidget" name="ManageTab">
+      <attribute name="title">
+       <string>Local Datasets</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QTreeWidget" name="treeWidget">
+         <property name="headerHidden">
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text">
+           <string notr="true">1</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="DownloadTab">
+      <attribute name="title">
+       <string>Download Datasets</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QWebView" name="DownloadPage">
+         <property name="url">
+          <url>
+           <string>http://10.33.0.107/Midas/Midas3/slicerdatastore</string>
+          </url>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="DownloadProgressBar">
+         <property name="value">
+          <number>24</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="UploadTab">
+      <attribute name="title">
+       <string>Upload Datasets</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QWebView" name="UploadPage">
+         <property name="url">
+          <url>
+           <string>http://10.33.0.107/Midas/Midas3/slicerdatastore/user/login</string>
+          </url>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="UploadProgressBar">
+         <property name="value">
+          <number>24</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QWebView</class>
+   <extends>QWidget</extends>
+   <header>QtWebKit/QWebView</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
