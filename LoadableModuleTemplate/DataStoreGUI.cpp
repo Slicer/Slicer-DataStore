@@ -316,8 +316,7 @@ void DataStoreGUI::upload(const QString& url)
 {
   QString completeUrl = url;
   QString name = QUuid::createUuid().toString();
-//   this->saveDataset(QDir::tempPath() + "/" + name + ".mrb");
-  this->saveDataset("");
+  this->saveDataset(QDir::tempPath() + "/" + name + ".mrb");
   if(this->StreamedFile)
     {
     delete this->StreamedFile;
@@ -420,7 +419,7 @@ void DataStoreGUI::downloaded(QNetworkReply* reply)
 //Tell webPage upload is finished
 void DataStoreGUI::uploaded(QNetworkReply* reply)
 {  
-  std::cout << this->StreamStat << std::endl;
+  std::cout << this->StreamStat.toStdString() << std::endl;
   this->StreamedFile->remove();
   delete this->StreamedFile;
   this->StreamedFile = 0;
