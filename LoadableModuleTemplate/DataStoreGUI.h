@@ -36,7 +36,6 @@ public:
   
   void addNewTreeItem(QFileInfo fileName);
   void deleteTreeItem(QString fileName);
-  void cancelDownload();
     
 public slots:
   void downloaded(QNetworkReply* reply);
@@ -49,7 +48,9 @@ public slots:
   
   void download(const QString& url, const QString& thumbnail);
   void upload(const QString& url);
+  void cancelDownload();
   QString getStreamStat();
+  QString getDownloadedItems();
   
 signals:
   void ScheduleLoad(QString);
@@ -73,6 +74,7 @@ private:
     QTime StreamTime;
     QString StreamStat;
     QFile* StreamedFile;
+    QString StreamId;
     bool DownloadCanceled;
     QSignalMapper LoadButtonMapper;
     QSignalMapper DeleteButtonMapper;

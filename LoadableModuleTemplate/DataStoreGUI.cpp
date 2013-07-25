@@ -301,7 +301,6 @@ void DataStoreGUI::download(const QString &url, const QString& thumbnail)
     {
     QDir().mkdir(this->DataSetDir);
     }
-    
   QString fileName = qUrl.queryItemValue("name") + ".mrb";
   QFile* file = new QFile(this->DataSetDir + fileName);
   if(file->exists())
@@ -396,8 +395,21 @@ void DataStoreGUI::onStreamProgress(qint64 bytes, qint64 bytesTotal)
 //---------------------------------------------------------------------------
 QString DataStoreGUI::getStreamStat()
 {
-//   std::cout << "Dl progress " << this->DownloadStat.toStdString() << std::endl;
+//   std::cout << "Dl progress " << this->StreamStat.toStdString() << std::endl;
   return this->StreamStat;
+}
+
+//---------------------------------------------------------------------------
+QString DataStoreGUI::getDownloadedItems()
+{
+  QString items;
+  for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++)
+    {
+    QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
+    QString Id = item->text(DataStoreGUI::NameColumn).section('_', 0, 0);
+    items += Id + ";;";
+    }
+  return items;
 }
 
 //---------------------------------------------------------------------------
