@@ -7,20 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>224</width>
-    <height>70</height>
+    <height>80</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Foo bar</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QPushButton" name="DisplayButton">
-     <property name="text">
-      <string>Display Datastore</string>
-     </property>
-    </widget>
-   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -36,11 +29,18 @@
         <string>DataStoreUrl</string>
        </property>
        <property name="text">
-        <string>http://10.33.0.107/Midas/Midas3/slicerdatastore</string>
+        <string>http://10.33.0.107/Midas/Midas3</string>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="DisplayButton">
+     <property name="text">
+      <string>Display Datastore</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

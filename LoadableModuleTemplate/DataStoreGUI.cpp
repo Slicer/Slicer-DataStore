@@ -52,7 +52,10 @@ DataStoreGUI::DataStoreGUI(QWidget *parent) :
   this->downloadFrame = ui->DownloadPage->page()->mainFrame();
   this->uploadFrame = ui->UploadPage->page()->mainFrame();
   
+  //Configure "local dataset" tab
   ui->treeWidget->setColumnCount(DataStoreGUI::ColumnCount);
+  ui->treeWidget->setColumnWidth(DataStoreGUI::NameColumn, 500);
+  ui->treeWidget->setHeaderHidden(true);
   ui->treeWidget->setRootIsDecorated(false);
   ui->treeWidget->setIconSize(QSize(64, 64));
   ui->treeWidget->setAllColumnsShowFocus(true);
@@ -216,7 +219,16 @@ void DataStoreGUI::setFailurePage(QWebView* webView)
 // --------------------------------------------------------------------------
 void DataStoreGUI::onLinkClicked(const QUrl& url)
 {
-  QWebView* webView = dynamic_cast<QWebView*>(sender());
+  QWebPage* webPage = dynamic_cast<QWebPage*>(sender());
+  QWebView* webView;
+  if(webPage == ui->DownloadPage->page())
+    {
+    webView = ui->DownloadPage;
+    }
+  else
+    {
+    webView = ui->UploadPage;
+    }
   QUrl serverUrl = webView->url();
   if(url.host() == serverUrl.host())
     {
@@ -266,9 +278,15 @@ void DataStoreGUI::deleteDataset(QString fileName)
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::loadURL(QString url)
+void DataStoreGUI::loadDataStoreURLs(QString url)
 {
+  if(url.at(url.size()-1) != '/')
+    {
+    url += "/";
+    }
+  url += "slicerdatastore/";
   ui->DownloadPage->setUrl(QUrl(url));
+  ui->UploadPage->setUrl(QUrl(url+"user/login"));
 }
 
 //---------------------------------------------------------------------------
@@ -284,7 +302,7 @@ void DataStoreGUI::download(const QString &url, const QString& thumbnail)
     QDir().mkdir(this->DataSetDir);
     }
     
-  QString fileName = qUrl.queryItemValue("name");
+  QString fileName = qUrl.queryItemValue("name") + ".mrb";
   QFile* file = new QFile(this->DataSetDir + fileName);
   if(file->exists())
     {    
@@ -371,8 +389,8 @@ void DataStoreGUI::onStreamProgress(qint64 bytes, qint64 bytesTotal)
     unit = "MB/s";
     }
   
-  this->StreamStat = QString::number(100.0*(double)bytes/(double)bytesTotal)
-                       + ";;" + QString::number(speed) + unit;
+  this->StreamStat = QString::number(100.0*(double)bytes/(double)bytesTotal, 'f', 1)
+                       + ";;" + QString::number(speed, 'f', 2) + unit;
 }
 
 //---------------------------------------------------------------------------
@@ -419,7 +437,6 @@ void DataStoreGUI::downloaded(QNetworkReply* reply)
 //Tell webPage upload is finished
 void DataStoreGUI::uploaded(QNetworkReply* reply)
 {  
-  std::cout << this->StreamStat.toStdString() << std::endl;
   this->StreamedFile->remove();
   delete this->StreamedFile;
   this->StreamedFile = 0;
@@ -448,12 +465,6 @@ void DataStoreGUI::cancelDownload()
     this->DownloadCanceled = true;
     this->CurrentReply->abort(); //Send finished signal
     }
-}
-
-//---------------------------------------------------------------------------
-void DataStoreGUI::onNetworkError(QNetworkReply::NetworkError code)
-{
-  std::cout << code << std::endl;
 }
 
 // --------------------------------------------------------------------------

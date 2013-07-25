@@ -68,7 +68,7 @@ void qSlicerDataStoreModuleWidget::enter()
     QObject::connect(d->SlicerDataStoreWidget, SIGNAL(DisplayButtonClicked()),
                      this->DataStoreWindow, SLOT(displayWindow()));
     QObject::connect(d->SlicerDataStoreWidget, SIGNAL(UrlModified(QString)),
-                     this->DataStoreWindow, SLOT(loadURL(QString)));
+                     this->DataStoreWindow, SLOT(loadDataStoreURLs(QString)));
     QObject::connect(this->DataStoreWindow, SIGNAL(ScheduleLoad(QString)),
                      this->Module, SLOT(LoadScene(QString)));
     QObject::connect(this->DataStoreWindow, SIGNAL(ScheduleSave(QString)),

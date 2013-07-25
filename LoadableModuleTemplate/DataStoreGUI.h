@@ -10,7 +10,6 @@
 #include <QFile>
 #include <QSignalMapper>
 #include <QFileInfo>
-#include <QNetworkReply>
 
 class QWebView;
 
@@ -46,8 +45,7 @@ public slots:
   void onStreamProgress(qint64 bytes, qint64 bytesTotal);
   void loadDataset(QString fileName);
   void deleteDataset(QString fileName);
-  void loadURL(QString);
-  void onNetworkError(QNetworkReply::NetworkError);
+  void loadDataStoreURLs(QString);
   
   void download(const QString& url, const QString& thumbnail);
   void upload(const QString& url);
