@@ -21,7 +21,7 @@
 // SlicerQt includes
 #include "qSlicerAbstractModuleWidget.h"
 
-#include "qSlicerLoadableModuleTemplateModuleExport.h"
+#include "qSlicerDataStoreModuleExport.h"
 
 class qSlicerDataStoreModuleWidgetPrivate;
 class qSlicerDataStoreModule;
@@ -29,7 +29,7 @@ class vtkMRMLNode;
 class DataStoreGUI;
 
 /// \ingroup Slicer_QtModules_ExtensionTemplate
-class Q_SLICER_QTMODULES_LOADABLEMODULETEMPLATE_EXPORT qSlicerDataStoreModuleWidget :
+class Q_SLICER_QTMODULES_DATASTORE_EXPORT qSlicerDataStoreModuleWidget :
   public qSlicerAbstractModuleWidget
 {
   Q_OBJECT

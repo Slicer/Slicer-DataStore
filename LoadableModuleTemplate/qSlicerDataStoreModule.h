@@ -21,13 +21,13 @@
 // SlicerQt includes
 #include "qSlicerLoadableModule.h"
 
-#include "qSlicerLoadableModuleTemplateModuleExport.h"
+#include "qSlicerDataStoreModuleExport.h"
 
 class qSlicerDataStoreModulePrivate;
 class vtkSlicerDataStoreLogic;
 
 /// \ingroup Slicer_QtModules_ExtensionTemplate
-class Q_SLICER_QTMODULES_LOADABLEMODULETEMPLATE_EXPORT
+class Q_SLICER_QTMODULES_DATASTORE_EXPORT
 qSlicerDataStoreModule
   : public qSlicerLoadableModule
 {

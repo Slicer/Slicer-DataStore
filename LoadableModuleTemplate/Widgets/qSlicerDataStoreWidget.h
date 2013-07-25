@@ -25,12 +25,12 @@
 #include <QWidget>
 
 // Button Widgets includes
-#include "qSlicerLoadableModuleTemplateModuleWidgetsExport.h"
+#include "qSlicerDataStoreModuleWidgetsExport.h"
 
 class qSlicerDataStoreWidgetPrivate;
 
 /// \ingroup Slicer_QtModules_LoadableModuleTemplate
-class Q_SLICER_MODULE_LOADABLEMODULETEMPLATE_WIDGETS_EXPORT qSlicerDataStoreWidget
+class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qSlicerDataStoreWidget
   : public QWidget
 {
   Q_OBJECT
