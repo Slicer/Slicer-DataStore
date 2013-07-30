@@ -1,3 +1,21 @@
+/*==============================================================================
+
+  Program: 3D Slicer
+
+  Portions (c) Copyright Brigham and Women's Hospital (BWH) All Rights Reserved.
+
+  See COPYRIGHT.txt
+  or http://www.slicer.org/copyright/copyright.txt for details.
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+==============================================================================*/
+
+
 //Loadable module includes
 #include "DataStoreGUI.h"
 
@@ -61,7 +79,8 @@ DataStoreGUI::DataStoreGUI(QWidget *parent) :
   ui->treeWidget->setAllColumnsShowFocus(true);
   ui->treeWidget->setAlternatingRowColors(true);
   ui->treeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  
+  ui->treeWidget->hide();
+  ui->noDatasetMessage->show();
   QDir dataPath(this->DataSetDir);
   if(dataPath.exists())
     {
@@ -128,6 +147,8 @@ DataStoreGUI::DataStoreGUI(QWidget *parent) :
 // --------------------------------------------------------------------------
 void DataStoreGUI::addNewTreeItem(QFileInfo fileName)
 {
+  ui->treeWidget->show();
+  ui->noDatasetMessage->hide();
   QTreeWidgetItem* item = new QTreeWidgetItem();
   ui->treeWidget->addTopLevelItem(item);
   
@@ -206,10 +227,10 @@ void DataStoreGUI::setFailurePage(QWebView* webView)
       "</style>"
       "<div class='viewWrapperSlicer'>"
       "  <div class='extensionsHeader'>"
-      "    <div class='extensionsTitle'>Slicer Extensions</div>"
+      "    <div class='extensionsTitle'>Slicer Data Stpre</div>"
       "  </div>"
       "  <div class='extensionsBody'>"
-      "    <p>Failed to load extension page using the following URL:<br>%1</p>"
+      "    <p>Failed to load data store page using the following URL:<br>%1</p>"
       "  </div>"
       "</div>";
 
@@ -292,7 +313,6 @@ void DataStoreGUI::loadDataStoreURLs(QString url)
 //---------------------------------------------------------------------------
 void DataStoreGUI::download(const QString &url, const QString& thumbnail)
 {
-//   std::cout << "DL Start " << url.toStdString() << std::endl;
   this->DownloadCanceled = false;
   QUrl qUrl = QUrl(url);
   QUrl iconUrl = QUrl(thumbnail);
@@ -354,14 +374,14 @@ void DataStoreGUI::upload(const QString& url)
     multiPart->append(filePart);
     
     QNetworkRequest request(qUrl);
-    QNetworkReply *reply = this->networkUploadManager.post(request, multiPart);
-    multiPart->setParent(reply); // delete the multiPart with the reply
+    this->CurrentReply = this->networkUploadManager.post(request, multiPart);
+    multiPart->setParent(this->CurrentReply); // delete the multiPart with the reply
     
-    QObject::connect(reply, SIGNAL(uploadProgress(qint64,qint64)),
+    QObject::connect(this->CurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
             this, SLOT(onStreamProgress(qint64,qint64)));
     
     this->StreamTime.start();
-    this->StreamStat="0;;0bytes/sec";
+    this->StreamStat="0;;Download Speed: 0 B/s";
     }
   else
     {
@@ -376,20 +396,20 @@ void DataStoreGUI::onStreamProgress(qint64 bytes, qint64 bytesTotal)
   QString unit;
   if (speed < 1024)
     {
-    unit = "bytes/sec";
+    unit = " B/s";
     }
   else if (speed < 1024*1024) {
     speed /= 1024;
-    unit = "kB/s";
+    unit = " kB/s";
     }
   else
     {
     speed /= 1024*1024;
-    unit = "MB/s";
+    unit = " MB/s";
     }
   
   this->StreamStat = QString::number(100.0*(double)bytes/(double)bytesTotal, 'f', 1)
-                       + ";;" + QString::number(speed, 'f', 2) + unit;
+                       + ";;Download Speed: " + QString::number(speed, 'f', 2) + unit;
 }
 
 //---------------------------------------------------------------------------
@@ -413,7 +433,6 @@ QString DataStoreGUI::getDownloadedItems()
 }
 
 //---------------------------------------------------------------------------
-//Save data as a file
 void DataStoreGUI::downloaded(QNetworkReply* reply)
 {
 //   std::cout << "DL End " << std::endl;
@@ -446,7 +465,6 @@ void DataStoreGUI::downloaded(QNetworkReply* reply)
 }
 
 //---------------------------------------------------------------------------
-//Tell webPage upload is finished
 void DataStoreGUI::uploaded(QNetworkReply* reply)
 {  
   this->StreamedFile->remove();

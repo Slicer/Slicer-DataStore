@@ -25,6 +25,25 @@
 #include <qSlicerSceneBundleIO.h>
 #include <../Loadable/Data/qSlicerSceneWriter.h>
 
+// Slicer includes
+#include "qSlicerApplication.h"
+#include "qSlicerLayoutManager.h"
+
+// CTK includes
+#include <ctkErrorLogWidget.h>
+#include <ctkFileDialog.h>
+#include <ctkMessageBox.h>
+#ifdef Slicer_USE_PYTHONQT
+# include <ctkPythonConsole.h>
+#endif
+#ifdef Slicer_USE_QtTesting
+# include <ctkQtTestingUtility.h>
+#endif
+#include <ctkVTKWidgetsUtils.h>
+
+// QT includes
+#include <QImage>
+
 // STD includes
 #include <cassert>
 
@@ -58,6 +77,7 @@ void vtkSlicerDataStoreLogic::LoadMRMLScene(QString mrmlFilePath)
     parameters["clear"] = true;
     sceneLoader->setMRMLScene(this->GetMRMLScene());
     sceneLoader->load(parameters);
+    delete sceneLoader;
     }
   else
     {
@@ -73,8 +93,12 @@ void vtkSlicerDataStoreLogic::SaveMRMLScene(QString fileName)
     qSlicerSceneWriter* sceneWriter = new qSlicerSceneWriter();
     qSlicerIO::IOProperties parameters;
     parameters["fileName"] = fileName;
+    QWidget* widget = qSlicerApplication::application()->layoutManager()->viewport();
+    QImage screenShot = ctk::grabVTKWidget(widget);
+    parameters["screenShot"] = screenShot;
     sceneWriter->setMRMLScene(this->GetMRMLScene());
     sceneWriter->write(parameters);
+    delete sceneWriter;
     }
   else
     {

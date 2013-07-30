@@ -15,10 +15,9 @@
 
 ==============================================================================*/
 
-// .NAME vtkSlicerLoadableModuleTemplateLogic - slicer logic class for volumes manipulation
+// .NAME vtkSlicerDataStoreLogic - slicer logic class for scene manipulation
 // .SECTION Description
-// This class manages the logic associated with reading, saving,
-// and changing propertied of the volumes
+// This class manages the logic associated with reading and writing a scene
 
 
 #ifndef __vtkSlicerDataStoreLogic_h
@@ -35,6 +34,12 @@
 #include "vtkSlicerDataStoreModuleLogicExport.h"
 #include <QString>
 
+// CTK includes
+#include <ctkPimpl.h>
+class ctkPythonConsole;
+class ctkErrorLogWidget;
+
+
 /// \ingroup Slicer_QtModules_ExtensionTemplate
 class VTK_SLICER_DATASTORE_MODULE_LOGIC_EXPORT vtkSlicerDataStoreLogic :
   public vtkSlicerModuleLogic
@@ -45,7 +50,10 @@ public:
   vtkTypeMacro(vtkSlicerDataStoreLogic, vtkSlicerModuleLogic);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+  // Load a MRML File.
   void LoadMRMLScene(QString mrmlFilePath);
+  
+  // Save the current Scene
   void SaveMRMLScene(QString fileName);
 
 protected:
@@ -53,6 +61,7 @@ protected:
   virtual ~vtkSlicerDataStoreLogic();
 
   virtual void SetMRMLSceneInternal(vtkMRMLScene* newScene);
+  
   /// Register MRML Node classes to Scene. Gets called automatically when the MRMLScene is attached to this logic class.
   virtual void RegisterNodes();
   virtual void UpdateFromMRMLScene();

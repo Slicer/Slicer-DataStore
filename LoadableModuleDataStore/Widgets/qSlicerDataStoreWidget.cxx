@@ -2,7 +2,7 @@
 
   Program: 3D Slicer
 
-  Copyright (c) Kitware Inc.
+  Portions (c) Copyright Brigham and Women's Hospital (BWH) All Rights Reserved.
 
   See COPYRIGHT.txt
   or http://www.slicer.org/copyright/copyright.txt for details.
@@ -13,14 +13,14 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 
-  This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc.
-  and was partially funded by NIH grant 3P41RR013218-12S1
-
 ==============================================================================*/
 
 // Widgets includes
 #include "qSlicerDataStoreWidget.h"
 #include "ui_qSlicerDataStoreWidget.h"
+#include <QSettings>
+#include <QDir>
+#include <QDebug>
 
 //-----------------------------------------------------------------------------
 /// \ingroup Slicer_QtModules_LoadableModuleTemplate
@@ -64,6 +64,19 @@ qSlicerDataStoreWidget
   Q_D(qSlicerDataStoreWidget);
   d->setupUi(this);
   
+  QSettings settings (QDir::homePath() + "/.config/SlicerDatastore/settings.ini",
+                    QSettings::IniFormat);
+  
+  QString url = settings.value("datastore/serverUrl").toString();
+  if(!url.isEmpty())
+    {
+    d->DataStoreUrl->setText(url);
+    }
+  else
+    {
+    d->DataStoreUrl->setText(QString("http://slicer.kitware.com/midas3"));
+    }
+
   this->PreviousUrl = d->DataStoreUrl->text();
   
   QObject::connect(d->DisplayButton, SIGNAL(clicked()),
@@ -86,6 +99,9 @@ void qSlicerDataStoreWidget::onUrlModified()
     {     
     emit UrlModified(d->DataStoreUrl->text());
     this->PreviousUrl = d->DataStoreUrl->text();
+    QSettings settings (QDir::homePath() + "/.config/SlicerDatastore/settings.ini",
+                    QSettings::IniFormat);
+    settings.setValue("datastore/serverUrl", this->PreviousUrl);
     }
 }
 

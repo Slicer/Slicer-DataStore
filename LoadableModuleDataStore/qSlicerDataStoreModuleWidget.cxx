@@ -17,6 +17,8 @@
 
 // Qt includes
 #include <QDebug>
+#include <QSettings>
+#include <QDir>
 
 // SlicerQt includes
 #include "qSlicerDataStoreModuleWidget.h"
@@ -73,8 +75,19 @@ void qSlicerDataStoreModuleWidget::enter()
                      this->Module, SLOT(LoadScene(QString)));
     QObject::connect(this->DataStoreWindow, SIGNAL(ScheduleSave(QString)),
                      this->Module, SLOT(SaveScene(QString)));
+    
+    QSettings settings (QDir::homePath() + "/.config/SlicerDatastore/settings.ini",
+                    QSettings::IniFormat);
+  
+    QString url = settings.value("datastore/serverUrl").toString();
+    if(url.isEmpty())
+      {
+      url = QString("http://slicer.kitware.com/midas3");
+      }
+    this->DataStoreWindow->loadDataStoreURLs(url);
     }
   this->DataStoreWindow->show();
+  
   
   this->Superclass::enter();
 }

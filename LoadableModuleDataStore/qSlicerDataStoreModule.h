@@ -15,6 +15,8 @@
 
 ==============================================================================*/
 
+// .NAME qSlicerDataStoreModule
+
 #ifndef __qSlicerDataStoreModule_h
 #define __qSlicerDataStoreModule_h
 

@@ -56,6 +56,7 @@ qSlicerDataStoreModule
   : Superclass(_parent)
   , d_ptr(new qSlicerDataStoreModulePrivate)
 {
+      
 }
 
 //-----------------------------------------------------------------------------
@@ -66,20 +67,22 @@ qSlicerDataStoreModule::~qSlicerDataStoreModule()
 //-----------------------------------------------------------------------------
 QString qSlicerDataStoreModule::helpText()const
 {
-  return "This is a loadable module bundled in an extension";
+  return "This module allows users to download and upload datasets.";
 }
 
 //-----------------------------------------------------------------------------
 QString qSlicerDataStoreModule::acknowledgementText()const
 {
-  return "This work was was partially funded by NIH grant 3P41RR013218-12S1";
+  return "This work was funded by NIH grant 3P41RR013218-12S1";
 }
 
 //-----------------------------------------------------------------------------
 QStringList qSlicerDataStoreModule::contributors()const
 {
   QStringList moduleContributors;
+  moduleContributors << QString("Charles Marion (Kitware)");
   moduleContributors << QString("Jean-Baptiste Berger (Kitware)");
+  moduleContributors << QString("Jean-Christophe Fillion-Robin (Kitware)");
   return moduleContributors;
 }
 
@@ -92,7 +95,7 @@ QIcon qSlicerDataStoreModule::icon()const
 //-----------------------------------------------------------------------------
 QStringList qSlicerDataStoreModule::categories() const
 {
-  return QStringList() << "Examples";
+  return QStringList() << "Utilities";
 }
 
 //-----------------------------------------------------------------------------

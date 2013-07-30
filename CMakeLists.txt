@@ -3,19 +3,19 @@ cmake_minimum_required(VERSION 2.8.9)
 project(slicerdatastore)
 
 #-----------------------------------------------------------------------------
-set(EXTENSION_HOMEPAGE "http://www.slicer.org/slicerWiki/index.php/Documentation/Nightly/Extensions/Test")
-set(EXTENSION_CATEGORY "Examples")
-set(EXTENSION_CONTRIBUTORS "Jean-Christophe Fillion-Robin (Kitware)")
-set(EXTENSION_DESCRIPTION "This is an example of extension bundling a loadable module")
-set(EXTENSION_ICONURL "http://viewvc.slicer.org/viewvc.cgi/Slicer4/trunk/Extensions/Testing/Test/Test.png?revision=21746&view=co")
-set(EXTENSION_SCREENSHOTURLS "http://wiki.slicer.org/slicerWiki/images/4/42/Slicer-r19441-Test-screenshot.png")
+set(EXTENSION_HOMEPAGE "todo")
+set(EXTENSION_CATEGORY "Utilities")
+set(EXTENSION_CONTRIBUTORS "Charles Marion, Jean-Baptiste Berger and Jean-Christophe Fillion-Robin (Kitware)")
+set(EXTENSION_DESCRIPTION "This module allows users to download and upload datasets.")
+set(EXTENSION_ICONURL "todo")
+set(EXTENSION_SCREENSHOTURLS "todo")
 
 #-----------------------------------------------------------------------------
 find_package(Slicer REQUIRED)
 include(${Slicer_USE_FILE})
 
 #-----------------------------------------------------------------------------
-add_subdirectory(LoadableModuleTemplate)
+add_subdirectory(LoadableModuleDataStore)
 
 #-----------------------------------------------------------------------------
 include(${Slicer_EXTENSION_CPACK})
