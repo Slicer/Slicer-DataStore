@@ -237,7 +237,7 @@ void qDataStoreWidget::setFailurePage(QWebView* webView)
       "</style>"
       "<div class='viewWrapperSlicer'>"
       "  <div class='extensionsHeader'>"
-      "    <div class='extensionsTitle'>Slicer Data Stpre</div>"
+      "    <div class='extensionsTitle'>Slicer Data Store</div>"
       "  </div>"
       "  <div class='extensionsBody'>"
       "    <p>Failed to load data store page using the following URL:<br>%1</p>"
@@ -527,7 +527,7 @@ void qDataStoreWidget::initJavascript()
     isVisible = ui->UploadPage->isVisible();
     }
   this->setDocumentWebkitHidden(webFrame, !isVisible);
-  webFrame->addToJavaScriptWindowObject("qDataStoreWidget", this);
+  webFrame->addToJavaScriptWindowObject("DataStoreGUI", this);
 }
 
 // --------------------------------------------------------------------------

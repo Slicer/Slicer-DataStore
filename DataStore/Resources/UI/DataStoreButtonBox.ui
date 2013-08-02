@@ -31,9 +31,6 @@
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="1">
       <widget class="QPushButton" name="DeleteButton">
-       <property name="toolTip">
-        <string>Tell the application to uninstall this extension when it will restart.</string>
-       </property>
        <property name="text">
         <string>Delete</string>
        </property>
@@ -41,9 +38,6 @@
      </item>
      <item row="0" column="0">
       <widget class="QPushButton" name="LoadButton">
-       <property name="toolTip">
-        <string>Tell the application to load this extension by adding all associated module paths to the application settings.</string>
-       </property>
        <property name="text">
         <string>Load</string>
        </property>
