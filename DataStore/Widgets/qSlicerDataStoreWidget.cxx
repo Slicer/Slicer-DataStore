@@ -22,6 +22,9 @@
 #include <QDir>
 #include <QDebug>
 
+// Slicer includes
+#include <qSlicerCoreApplication.h>
+
 //-----------------------------------------------------------------------------
 /// \ingroup Slicer_QtModules_LoadableModuleTemplate
 class qSlicerDataStoreWidgetPrivate
@@ -64,8 +67,9 @@ qSlicerDataStoreWidget
   Q_D(qSlicerDataStoreWidget);
   d->setupUi(this);
   
-  QSettings settings (QDir::homePath() + "/.config/SlicerDatastore/settings.ini",
-                    QSettings::IniFormat);
+  qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
+  QString dirPath  = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
+  QSettings settings (dirPath + "settings.ini", QSettings::IniFormat);
   
   QString url = settings.value("datastore/serverUrl").toString();
   if(!url.isEmpty())
@@ -99,8 +103,9 @@ void qSlicerDataStoreWidget::onUrlModified()
     {     
     emit UrlModified(d->DataStoreUrl->text());
     this->PreviousUrl = d->DataStoreUrl->text();
-    QSettings settings (QDir::homePath() + "/.config/SlicerDatastore/settings.ini",
-                    QSettings::IniFormat);
+    qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
+    QString dirPath  = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
+    QSettings settings (dirPath + "settings.ini", QSettings::IniFormat);
     settings.setValue("datastore/serverUrl", this->PreviousUrl);
     }
 }

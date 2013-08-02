@@ -17,10 +17,10 @@
 
 
 //Loadable module includes
-#include "DataStoreGUI.h"
+#include "qDataStoreWidget.h"
 
 //GUI includes
-#include "ui_DataStoreGUI.h"
+#include "ui_qDataStoreWidget.h"
 #include "ui_DataStoreButtonBox.h"
 
 //Qt Includes
@@ -32,12 +32,17 @@
 #include <QNetworkReply>
 #include <QFileInfo>
 #include <QDir>
+#include <QSettings>
 #include <QTreeWidget>
 #include <QHttpMultiPart>
+#include <QDebug>
 #include <QUuid>
 
 //Midas includes
 #include <qMidasAPI.h>
+
+//Slicer includes
+#include <qSlicerCoreApplication.h>
 
 // --------------------------------------------------------------------------
 class DataStoreButtonBox : public QWidget, public Ui_DataStoreButtonBox
@@ -50,13 +55,14 @@ public:
     }
 };
 
-DataStoreGUI::DataStoreGUI(QWidget *parent) :
+qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::DataStoreGUI)
+    ui(new Ui::qDataStoreWidget)
 {
   this->CurrentReply = 0;
   this->StreamedFile = 0;
-  this->DataSetDir = QDir::homePath() + "/.config/SlicerDatastore/";
+  qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
+  this->DataSetDir = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
   
   QObject::connect(&this->LoadButtonMapper, SIGNAL(mapped(QString)),
                    this, SLOT(loadDataset(QString)));
@@ -71,8 +77,8 @@ DataStoreGUI::DataStoreGUI(QWidget *parent) :
   this->uploadFrame = ui->UploadPage->page()->mainFrame();
   
   //Configure "local dataset" tab
-  ui->treeWidget->setColumnCount(DataStoreGUI::ColumnCount);
-  ui->treeWidget->setColumnWidth(DataStoreGUI::NameColumn, 500);
+  ui->treeWidget->setColumnCount(qDataStoreWidget::ColumnCount);
+  ui->treeWidget->setColumnWidth(qDataStoreWidget::NameColumn, 500);
   ui->treeWidget->setHeaderHidden(true);
   ui->treeWidget->setRootIsDecorated(false);
   ui->treeWidget->setIconSize(QSize(64, 64));
@@ -94,6 +100,10 @@ DataStoreGUI::DataStoreGUI(QWidget *parent) :
         this->addNewTreeItem(fileInfo);
         }
       }
+    }
+  else
+    {
+    dataPath.mkdir(this->DataSetDir);
     }
   
   QWebSettings::globalSettings();
@@ -145,19 +155,19 @@ DataStoreGUI::DataStoreGUI(QWidget *parent) :
 }
 
 // --------------------------------------------------------------------------
-void DataStoreGUI::addNewTreeItem(QFileInfo fileName)
+void qDataStoreWidget::addNewTreeItem(QFileInfo fileName)
 {
   ui->treeWidget->show();
   ui->noDatasetMessage->hide();
   QTreeWidgetItem* item = new QTreeWidgetItem();
   ui->treeWidget->addTopLevelItem(item);
   
-  item->setText(DataStoreGUI::NameColumn, fileName.fileName());
-  item->setIcon(DataStoreGUI::IconColumn,
+  item->setText(qDataStoreWidget::NameColumn, fileName.fileName());
+  item->setIcon(qDataStoreWidget::IconColumn,
                 QIcon(this->DataSetDir + fileName.baseName() + ".jpeg"));
 
   DataStoreButtonBox* buttonBox = new DataStoreButtonBox();
-  ui->treeWidget->setItemWidget(item, DataStoreGUI::ButtonsColumn, buttonBox);
+  ui->treeWidget->setItemWidget(item, qDataStoreWidget::ButtonsColumn, buttonBox);
   this->LoadButtonMapper.setMapping(buttonBox->LoadButton, fileName.fileName());
   QObject::connect(buttonBox->LoadButton, SIGNAL(clicked()), &this->LoadButtonMapper, SLOT(map()));
   this->DeleteButtonMapper.setMapping(buttonBox->DeleteButton, fileName.fileName());
@@ -165,16 +175,16 @@ void DataStoreGUI::addNewTreeItem(QFileInfo fileName)
 }
 
 // --------------------------------------------------------------------------
-void DataStoreGUI::deleteTreeItem(QString fileName)
+void qDataStoreWidget::deleteTreeItem(QString fileName)
 {
-  QList<QTreeWidgetItem*> items = ui->treeWidget->findItems(fileName, Qt::MatchExactly, DataStoreGUI::NameColumn);
+  QList<QTreeWidgetItem*> items = ui->treeWidget->findItems(fileName, Qt::MatchExactly, qDataStoreWidget::NameColumn);
   QTreeWidgetItem* item = items.at(0);
   ui->treeWidget->setCurrentItem(item);
   delete ui->treeWidget->takeTopLevelItem(ui->treeWidget->currentIndex().row());
 }
 
 // --------------------------------------------------------------------------
-void DataStoreGUI::onLoadStarted()
+void qDataStoreWidget::onLoadStarted()
 {
   QWebView* webView = dynamic_cast<QWebView*>(sender());
   if(webView == ui->DownloadPage)
@@ -190,7 +200,7 @@ void DataStoreGUI::onLoadStarted()
 }
 
 // --------------------------------------------------------------------------
-void DataStoreGUI::onLoadFinished(bool ok)
+void qDataStoreWidget::onLoadFinished(bool ok)
 {
   //   std::cout << "Load Finished" << std::endl;
   QWebView* webView = dynamic_cast<QWebView*>(sender());
@@ -211,7 +221,7 @@ void DataStoreGUI::onLoadFinished(bool ok)
 }
 
 // --------------------------------------------------------------------------
-void DataStoreGUI::setFailurePage(QWebView* webView)
+void qDataStoreWidget::setFailurePage(QWebView* webView)
 {
   QString html =
       "<style type='text/css'>"
@@ -238,7 +248,7 @@ void DataStoreGUI::setFailurePage(QWebView* webView)
 }
 
 // --------------------------------------------------------------------------
-void DataStoreGUI::onLinkClicked(const QUrl& url)
+void qDataStoreWidget::onLinkClicked(const QUrl& url)
 {
   QWebPage* webPage = dynamic_cast<QWebPage*>(sender());
   QWebView* webView;
@@ -265,32 +275,32 @@ void DataStoreGUI::onLinkClicked(const QUrl& url)
 }
 
 // --------------------------------------------------------------------------
-void DataStoreGUI::setDocumentWebkitHidden(QWebFrame* webFrame, bool value)
+void qDataStoreWidget::setDocumentWebkitHidden(QWebFrame* webFrame, bool value)
 {
   this->evalJS(webFrame, QString("document.webkitHidden = %1").arg(value ? "true" : "false"));
 }
 
 //---------------------------------------------------------------------------
-QString DataStoreGUI::evalJS(QWebFrame* webFrame, const QString &js)
+QString qDataStoreWidget::evalJS(QWebFrame* webFrame, const QString &js)
 {
   return webFrame->evaluateJavaScript(js).toString();
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::loadDataset(QString fileName)
+void qDataStoreWidget::loadDataset(QString fileName)
 {
   emit ScheduleLoad(this->DataSetDir + fileName);
   this->hide();
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::saveDataset(QString fileName)
+void qDataStoreWidget::saveDataset(QString fileName)
 {
   emit ScheduleSave(fileName);
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::deleteDataset(QString fileName)
+void qDataStoreWidget::deleteDataset(QString fileName)
 {
   QFileInfo fileInfo(this->DataSetDir + fileName);
   QFile::remove(this->DataSetDir + fileName); //DataSet
@@ -299,7 +309,7 @@ void DataStoreGUI::deleteDataset(QString fileName)
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::loadDataStoreURLs(QString url)
+void qDataStoreWidget::loadDataStoreURLs(QString url)
 {
   if(url.at(url.size()-1) != '/')
     {
@@ -311,7 +321,7 @@ void DataStoreGUI::loadDataStoreURLs(QString url)
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::download(const QString &url, const QString& thumbnail)
+void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
 {
   this->DownloadCanceled = false;
   QUrl qUrl = QUrl(url);
@@ -349,7 +359,7 @@ void DataStoreGUI::download(const QString &url, const QString& thumbnail)
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::upload(const QString& url)
+void qDataStoreWidget::upload(const QString& url)
 {
   QString completeUrl = url;
   QString name = QUuid::createUuid().toString();
@@ -390,7 +400,7 @@ void DataStoreGUI::upload(const QString& url)
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::onStreamProgress(qint64 bytes, qint64 bytesTotal)
+void qDataStoreWidget::onStreamProgress(qint64 bytes, qint64 bytesTotal)
 {
   double speed = bytes * 1000.0 / this->StreamTime.elapsed();
   QString unit;
@@ -413,27 +423,27 @@ void DataStoreGUI::onStreamProgress(qint64 bytes, qint64 bytesTotal)
 }
 
 //---------------------------------------------------------------------------
-QString DataStoreGUI::getStreamStat()
+QString qDataStoreWidget::getStreamStat()
 {
 //   std::cout << "Dl progress " << this->StreamStat.toStdString() << std::endl;
   return this->StreamStat;
 }
 
 //---------------------------------------------------------------------------
-QString DataStoreGUI::getDownloadedItems()
+QString qDataStoreWidget::getDownloadedItems()
 {
   QString items;
   for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++)
     {
     QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
-    QString Id = item->text(DataStoreGUI::NameColumn).section('_', 0, 0);
+    QString Id = item->text(qDataStoreWidget::NameColumn).section('_', 0, 0);
     items += Id + ";;";
     }
   return items;
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::downloaded(QNetworkReply* reply)
+void qDataStoreWidget::downloaded(QNetworkReply* reply)
 {
 //   std::cout << "DL End " << std::endl;
   if(!this->DownloadCanceled)
@@ -465,7 +475,7 @@ void DataStoreGUI::downloaded(QNetworkReply* reply)
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::uploaded(QNetworkReply* reply)
+void qDataStoreWidget::uploaded(QNetworkReply* reply)
 {  
   this->StreamedFile->remove();
   delete this->StreamedFile;
@@ -475,7 +485,7 @@ void DataStoreGUI::uploaded(QNetworkReply* reply)
 }
 
 //---------------------------------------------------------------------------
-void DataStoreGUI::iconDownloaded(QNetworkReply* reply)
+void qDataStoreWidget::iconDownloaded(QNetworkReply* reply)
 {
   QByteArray data = reply->readAll();
   QFileInfo fileInfo(this->StreamedFile->fileName());
@@ -487,7 +497,7 @@ void DataStoreGUI::iconDownloaded(QNetworkReply* reply)
 
 //---------------------------------------------------------------------------
 //Abort network reply and call downloaded slot
-void DataStoreGUI::cancelDownload()
+void qDataStoreWidget::cancelDownload()
 {
 //   std::cout << "Cancel DL" << std::endl;
   if(this->CurrentReply)
@@ -498,13 +508,13 @@ void DataStoreGUI::cancelDownload()
 }
 
 // --------------------------------------------------------------------------
-void DataStoreGUI::displayWindow()
+void qDataStoreWidget::displayWindow()
 {
   this->show();
   this->raise();
 }
 // --------------------------------------------------------------------------
-void DataStoreGUI::initJavascript()
+void qDataStoreWidget::initJavascript()
 {
   QWebFrame* webFrame = dynamic_cast<QWebFrame*>(sender());
   bool isVisible = false;
@@ -517,11 +527,11 @@ void DataStoreGUI::initJavascript()
     isVisible = ui->UploadPage->isVisible();
     }
   this->setDocumentWebkitHidden(webFrame, !isVisible);
-  webFrame->addToJavaScriptWindowObject("DataStoreGUI", this);
+  webFrame->addToJavaScriptWindowObject("qDataStoreWidget", this);
 }
 
 // --------------------------------------------------------------------------
-DataStoreGUI::~DataStoreGUI()
+qDataStoreWidget::~qDataStoreWidget()
 {
   delete ui;
 }

@@ -2,8 +2,11 @@ set(KIT qSlicer${MODULE_NAME}Module)
 
 #-----------------------------------------------------------------------------
 set(KIT_TEST_SRCS
-  #qSlicer${MODULE_NAME}ModuleTest.cxx
+  vtkSlicerDataStoreLogicTest.cxx
+  qSlicerDataStoreModuleTest.cxx
   )
+
+set(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/../Data/")
 
 #-----------------------------------------------------------------------------
 slicerMacroConfigureModuleCxxTestDriver(
@@ -13,4 +16,5 @@ slicerMacroConfigureModuleCxxTestDriver(
   )
 
 #-----------------------------------------------------------------------------
-#simple_test(qSlicer${MODULE_NAME}ModuleTest)
+simple_test(vtkSlicerDataStoreLogicTest ${INPUT}EmptyScene.mrb)
+simple_test(qSlicerDataStoreModuleTest)

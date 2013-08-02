@@ -28,7 +28,7 @@
 class qSlicerDataStoreModuleWidgetPrivate;
 class qSlicerDataStoreModule;
 class vtkMRMLNode;
-class DataStoreGUI;
+class qDataStoreWidget;
 
 /// \ingroup Slicer_QtModules_ExtensionTemplate
 class Q_SLICER_QTMODULES_DATASTORE_EXPORT qSlicerDataStoreModuleWidget :
@@ -55,7 +55,7 @@ private:
   Q_DECLARE_PRIVATE(qSlicerDataStoreModuleWidget);
   Q_DISABLE_COPY(qSlicerDataStoreModuleWidget);
   
-  DataStoreGUI* DataStoreWindow;
+  qDataStoreWidget* DataStoreWindow;
   qSlicerDataStoreModule* Module;
 };
 

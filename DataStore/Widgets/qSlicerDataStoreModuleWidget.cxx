@@ -24,9 +24,10 @@
 #include "qSlicerDataStoreModuleWidget.h"
 #include "qSlicerDataStoreModule.h"
 #include "ui_qSlicerDataStoreModuleWidget.h"
+#include <qSlicerCoreApplication.h>
 
-//LoadableModule includes
-#include "DataStoreGUI.h"
+//Module includes
+#include "qDataStoreWidget.h"
 
 //-----------------------------------------------------------------------------
 /// \ingroup Slicer_QtModules_ExtensionTemplate
@@ -66,7 +67,7 @@ void qSlicerDataStoreModuleWidget::enter()
   
   if(!this->DataStoreWindow)
     {
-    this->DataStoreWindow = new DataStoreGUI();
+    this->DataStoreWindow = new qDataStoreWidget();
     QObject::connect(d->SlicerDataStoreWidget, SIGNAL(DisplayButtonClicked()),
                      this->DataStoreWindow, SLOT(displayWindow()));
     QObject::connect(d->SlicerDataStoreWidget, SIGNAL(UrlModified(QString)),
@@ -76,7 +77,9 @@ void qSlicerDataStoreModuleWidget::enter()
     QObject::connect(this->DataStoreWindow, SIGNAL(ScheduleSave(QString)),
                      this->Module, SLOT(SaveScene(QString)));
     
-    QSettings settings (QDir::homePath() + "/.config/SlicerDatastore/settings.ini",
+    qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
+    QString dirPath = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
+    QSettings settings (dirPath + "settings.ini",
                     QSettings::IniFormat);
   
     QString url = settings.value("datastore/serverUrl").toString();
@@ -87,7 +90,6 @@ void qSlicerDataStoreModuleWidget::enter()
     this->DataStoreWindow->loadDataStoreURLs(url);
     }
   this->DataStoreWindow->show();
-  
   
   this->Superclass::enter();
 }

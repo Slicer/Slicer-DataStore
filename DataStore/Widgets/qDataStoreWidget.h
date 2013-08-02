@@ -15,10 +15,10 @@
 
 ==============================================================================*/
 
-// .NAME DataStoreGUI - Manage the main module's UI
+// .NAME qDataStoreWidget - Manage the main module's UI
 
-#ifndef DATASTOREGUI_H
-#define DATASTOREGUI_H
+#ifndef qDATASTOREGUI_H
+#define qDATASTOREGUI_H
 
 #include <QWidget>
 #include <QUrl>
@@ -33,16 +33,16 @@
 class QWebView;
 
 namespace Ui {
-class DataStoreGUI;
+class qDataStoreWidget;
 }
 
-class DataStoreGUI : public QWidget
+class qDataStoreWidget : public QWidget
 {
     Q_OBJECT
     
 public:  
-  explicit DataStoreGUI(QWidget *parent = 0);
-  ~DataStoreGUI();
+  explicit qDataStoreWidget(QWidget *parent = 0);
+  ~qDataStoreWidget();
   void setFailurePage(QWebView* webView);
   
   enum ColumnsIds
@@ -98,7 +98,7 @@ protected slots:
   void displayWindow();
     
 private:
-    Ui::DataStoreGUI *ui;
+    Ui::qDataStoreWidget *ui;
     QWebFrame* downloadFrame;
     QWebFrame* uploadFrame;
     QNetworkAccessManager networkDownloadManager;
@@ -120,4 +120,4 @@ private:
     QString evalJS(QWebFrame* webFrame, const QString &js);
 };
 
-#endif // DATASTOREGUI_H
+#endif // qDATASTOREGUI_H

@@ -24,7 +24,7 @@
 // SlicerDataStore includes
 #include "qSlicerDataStoreModule.h"
 #include "qSlicerDataStoreModuleWidget.h"
-#include "DataStoreGUI.h"
+#include "qDataStoreWidget.h"
 #include <qSlicerSceneBundleIO.h>
 
 //-----------------------------------------------------------------------------

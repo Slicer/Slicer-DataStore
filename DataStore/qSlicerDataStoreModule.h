@@ -53,7 +53,7 @@ public:
   virtual QStringList categories()const;
   virtual QStringList dependencies() const;
   
-protected slots:
+public slots:
   void LoadScene(QString MRMLFilePath);
   void SaveScene(QString fileName);
 
