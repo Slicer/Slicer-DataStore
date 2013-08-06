@@ -6,6 +6,7 @@ set(${KIT}_EXPORT_DIRECTIVE "VTK_SLICER_${MODULE_NAME_UPPER}_MODULE_LOGIC_EXPORT
 
 set(${KIT}_INCLUDE_DIRECTORIES
   ${Slicer_DIR}/Modules/Loadable/Data
+  ${Slicer_DIR}/lib/Slicer-4.2/qt-loadable-modules/
   )
 
 set(${KIT}_SRCS
@@ -15,8 +16,7 @@ set(${KIT}_SRCS
 
 set(${KIT}_TARGET_LIBRARIES
   ${ITK_LIBRARIES}
-  ${Slicer_DIR}/lib/Slicer-4.2/qt-loadable-modules/libqSlicerDataModule.so
-  )
+ )
 #-----------------------------------------------------------------------------
 SlicerMacroBuildModuleLogic(
   NAME ${KIT}

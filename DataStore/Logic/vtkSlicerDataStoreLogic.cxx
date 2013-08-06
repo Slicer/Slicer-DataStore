@@ -22,12 +22,14 @@
 
 // VTK includes
 #include <vtkNew.h>
-#include <qSlicerSceneBundleIO.h>
-#include <../Loadable/Data/qSlicerSceneWriter.h>
 
 // Slicer includes
 #include "qSlicerApplication.h"
 #include "qSlicerLayoutManager.h"
+#include "qSlicerCoreIOManager.h"
+#include <qSlicerSceneBundleIO.h>
+
+#include <../Loadable/Data/qSlicerSceneWriter.h>
 
 // CTK includes
 #include <ctkErrorLogWidget.h>
@@ -43,6 +45,7 @@
 
 // QT includes
 #include <QImage>
+#include <QDebug>
 
 // STD includes
 #include <cassert>
@@ -90,15 +93,13 @@ void vtkSlicerDataStoreLogic::SaveMRMLScene(QString fileName)
 {
   if(fileName != "")
     {
-    qSlicerSceneWriter* sceneWriter = new qSlicerSceneWriter();
-    qSlicerIO::IOProperties parameters;
-    parameters["fileName"] = fileName;
+    qSlicerCoreIOManager* coreIOManager = qSlicerCoreApplication::application()->coreIOManager();
+    qSlicerIO::IOProperties fileParameters;
+    fileParameters["fileName"] = fileName;
     QWidget* widget = qSlicerApplication::application()->layoutManager()->viewport();
     QImage screenShot = ctk::grabVTKWidget(widget);
-    parameters["screenShot"] = screenShot;
-    sceneWriter->setMRMLScene(this->GetMRMLScene());
-    sceneWriter->write(parameters);
-    delete sceneWriter;
+    fileParameters["screenShot"] = screenShot;
+    coreIOManager->saveNodes("SceneFile", fileParameters);
     }
   else
     {
