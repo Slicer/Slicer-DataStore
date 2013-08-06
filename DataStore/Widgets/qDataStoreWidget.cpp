@@ -34,7 +34,6 @@
 #include <QDir>
 #include <QSettings>
 #include <QTreeWidget>
-#include <QHttpMultiPart>
 #include <QDebug>
 #include <QUuid>
 
@@ -374,19 +373,9 @@ void qDataStoreWidget::upload(const QString& url)
     {
     completeUrl += QString::number(this->StreamedFile->size());
     QUrl qUrl = QUrl(completeUrl);
-  
-    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QHttpPart filePart;
-    filePart.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/octet-stream"));//stream?
-    filePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"file\"; filename=\""+ qUrl.queryItemValue("filename") + "\""));
-    filePart.setBodyDevice(this->StreamedFile);
-    this->StreamedFile->setParent(multiPart); // we cannot delete the file now, so delete it with the multiPart
-    multiPart->append(filePart);
-    
+      
     QNetworkRequest request(qUrl);
-    this->CurrentReply = this->networkUploadManager.post(request, multiPart);
-    multiPart->setParent(this->CurrentReply); // delete the multiPart with the reply
-    
+    this->CurrentReply = this->networkUploadManager.put(request, this->StreamedFile);    
     QObject::connect(this->CurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
             this, SLOT(onStreamProgress(qint64,qint64)));
     
