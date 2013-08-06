@@ -343,11 +343,15 @@ void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
     }
   
   this->CurrentReply = this->networkDownloadManager.get(QNetworkRequest(qUrl));
+  if(this->CurrentReply->error() != QNetworkReply::NoError)
+    {
+    qWarning() << "Network error. Unable to download file:" << this->CurrentReply->error();
+    }
   QObject::connect(this->CurrentReply, SIGNAL(downloadProgress(qint64,qint64)),
           this, SLOT(onStreamProgress(qint64,qint64)));
   this->networkIconManager.get(QNetworkRequest(iconUrl));
   this->StreamTime.start();
-  this->StreamStat="0;;0bytes/sec";
+  this->StreamStat="0;;Speed: 0 B/s";
   
   if(this->StreamedFile)
     {
@@ -376,11 +380,15 @@ void qDataStoreWidget::upload(const QString& url)
       
     QNetworkRequest request(qUrl);
     this->CurrentReply = this->networkUploadManager.put(request, this->StreamedFile);    
+    if(this->CurrentReply->error() != QNetworkReply::NoError)
+      {
+      qWarning() << "Network error. Unable to upload file:" << this->CurrentReply->error();
+      }
     QObject::connect(this->CurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
             this, SLOT(onStreamProgress(qint64,qint64)));
     
     this->StreamTime.start();
-    this->StreamStat="0;;Download Speed: 0 B/s";
+    this->StreamStat="0;;Speed: 0 B/s";
     }
   else
     {
@@ -408,7 +416,7 @@ void qDataStoreWidget::onStreamProgress(qint64 bytes, qint64 bytesTotal)
     }
   
   this->StreamStat = QString::number(100.0*(double)bytes/(double)bytesTotal, 'f', 1)
-                       + ";;Download Speed: " + QString::number(speed, 'f', 2) + unit;
+                       + ";;Speed: " + QString::number(speed, 'f', 2) + unit;
 }
 
 //---------------------------------------------------------------------------
