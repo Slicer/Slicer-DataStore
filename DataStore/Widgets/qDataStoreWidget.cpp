@@ -342,7 +342,7 @@ void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
     return;
     }
   
-  this->CurrentReply = this->networkDownloadManager.get(QNetworkRequest(qUrl));
+  this->CurrentReply = this->networkDownloadManager.post(QNetworkRequest(qUrl), QByteArray());
   if(this->CurrentReply->error() != QNetworkReply::NoError)
     {
     qWarning() << "Network error. Unable to download file:" << this->CurrentReply->error();
@@ -442,7 +442,10 @@ QString qDataStoreWidget::getDownloadedItems()
 //---------------------------------------------------------------------------
 void qDataStoreWidget::downloaded(QNetworkReply* reply)
 {
-//   std::cout << "DL End " << std::endl;
+  if(reply->error() != QNetworkReply::NoError)
+    { 
+    qWarning() << "Network error. Unable to download file:" << reply->error();
+    }
   if(!this->DownloadCanceled)
     {
     QByteArray data = reply->readAll();

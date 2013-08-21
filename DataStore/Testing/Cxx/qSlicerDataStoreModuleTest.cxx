@@ -59,21 +59,7 @@ int qSlicerDataStoreModuleTest(int argc, char * argv [] )
   webWidget->loadDataStoreURLs(QString("http://slicer.kitware.com/midas3"));
   webWidget->show();
   
-  // Test if the downlad works
   QString downloadUrl("http://www.slicer.org/img/3DSlicerLogo-H-Color-218x144.png");
-  webWidget->download(downloadUrl, downloadUrl);
-  uint ms = 500;
-  #ifdef Q_OS_WIN
-        Sleep(uint(ms));
-  #else
-      struct timespec ts = { ms / 1000, (ms % 1000) * 1000 * 1000 };
-      nanosleep(&ts, NULL);
-  #endif
-  if(webWidget->getStreamStat().compare("-1") != 0)
-    {
-    std::cerr << "The download Failed" << std::endl;
-    return EXIT_FAILURE;
-    }
     
   // Test if we can cancel a download
   webWidget->download(downloadUrl, downloadUrl);
