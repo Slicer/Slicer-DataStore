@@ -30,13 +30,15 @@
 #include <QSignalMapper>
 #include <QFileInfo>
 
+#include "qSlicerDataStoreModuleExport.h"
+
 class QWebView;
 
 namespace Ui {
 class qDataStoreWidget;
 }
 
-class qDataStoreWidget : public QWidget
+class Q_SLICER_QTMODULES_DATASTORE_EXPORT qDataStoreWidget : public QWidget
 {
     Q_OBJECT
     
