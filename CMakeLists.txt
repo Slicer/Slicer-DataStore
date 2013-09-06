@@ -4,7 +4,7 @@ project(slicerdatastore)
 
 #-----------------------------------------------------------------------------
 set(EXTENSION_HOMEPAGE "http://www.slicer.org/slicerWiki/index.php/Documentation/Nightly/Modules/DataStore")
-set(EXTENSION_CATEGORY "Utilities")
+set(EXTENSION_CATEGORY "Informatics")
 set(EXTENSION_CONTRIBUTORS "Charles Marion, Jean-Baptiste Berger and Jean-Christophe Fillion-Robin (Kitware)")
 set(EXTENSION_DESCRIPTION "This module allows users to download and upload datasets from a common database.")
 set(EXTENSION_ICONURL "http://www.slicer.org/slicerWiki/images/e/e9/MIDAS-PNG.png")
