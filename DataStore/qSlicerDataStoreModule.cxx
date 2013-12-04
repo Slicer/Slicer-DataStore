@@ -25,7 +25,6 @@
 #include "qSlicerDataStoreModule.h"
 #include "qSlicerDataStoreModuleWidget.h"
 #include "qDataStoreWidget.h"
-#include <qSlicerSceneBundleIO.h>
 
 //-----------------------------------------------------------------------------
 Q_EXPORT_PLUGIN2(qSlicerDataStoreModule, qSlicerDataStoreModule);

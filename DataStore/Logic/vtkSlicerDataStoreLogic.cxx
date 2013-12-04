@@ -30,7 +30,6 @@
 #include "qSlicerApplication.h"
 #include "qSlicerLayoutManager.h"
 #include "qSlicerCoreIOManager.h"
-#include <qSlicerSceneBundleIO.h>
 
 #include <../Loadable/Data/qSlicerSceneWriter.h>
 
@@ -77,13 +76,10 @@ void vtkSlicerDataStoreLogic::LoadMRMLScene(QString mrmlFilePath)
 {
   if(mrmlFilePath != "")
     {
-    qSlicerSceneBundleIO* sceneLoader = new qSlicerSceneBundleIO();
-    qSlicerIO::IOProperties parameters;
-    parameters["fileName"] = mrmlFilePath;
-    parameters["clear"] = true;
-    sceneLoader->setMRMLScene(this->GetMRMLScene());
-    sceneLoader->load(parameters);
-    delete sceneLoader;
+    qSlicerCoreIOManager* coreIOManager = qSlicerCoreApplication::application()->coreIOManager();
+    qSlicerIO::IOProperties fileParameters;
+    fileParameters["fileName"] = mrmlFilePath;
+    coreIOManager->loadNodes("SceneFile", fileParameters);
     }
   else
     {
