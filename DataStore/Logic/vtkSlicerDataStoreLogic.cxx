@@ -31,7 +31,7 @@
 #include "qSlicerLayoutManager.h"
 #include "qSlicerCoreIOManager.h"
 
-#include <../Loadable/Data/qSlicerSceneWriter.h>
+#include <qSlicerSceneWriter.h>
 
 // CTK includes
 #include <ctkErrorLogWidget.h>
