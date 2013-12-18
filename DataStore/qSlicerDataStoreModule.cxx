@@ -94,7 +94,7 @@ QIcon qSlicerDataStoreModule::icon()const
 //-----------------------------------------------------------------------------
 QStringList qSlicerDataStoreModule::categories() const
 {
-  return QStringList() << "Utilities";
+  return QStringList() << "" << "Utilities";
 }
 
 //-----------------------------------------------------------------------------
