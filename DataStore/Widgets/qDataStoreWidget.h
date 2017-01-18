@@ -20,19 +20,30 @@
 #ifndef qDATASTOREGUI_H
 #define qDATASTOREGUI_H
 
-#include <QWidget>
-#include <QUrl>
-#include <QTime>
-#include <iostream>
-#include <QNetworkRequest>
-#include <QWebFrame>
+// Qt includes
 #include <QFile>
-#include <QSignalMapper>
 #include <QFileInfo>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QSignalMapper>
+#include <QTime>
+#include <QUrl>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+#include <QWebFrame>
+#endif
+#include <QWidget>
+
+// STD includes
+#include <iostream>
 
 #include "qSlicerDataStoreModuleExport.h"
 
+class QNetworkReply;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
 class QWebView;
+#else
+class QWebEngineView;
+#endif
 
 namespace Ui {
 class qDataStoreWidget;
@@ -45,7 +56,11 @@ class Q_SLICER_QTMODULES_DATASTORE_EXPORT qDataStoreWidget : public QWidget
 public:  
   explicit qDataStoreWidget(QWidget *parent = 0);
   ~qDataStoreWidget();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   void setFailurePage(QWebView* webView);
+#else
+  void setFailurePage(QWebEngineView* webView);
+#endif
   
   enum ColumnsIds
   {
@@ -101,8 +116,15 @@ protected slots:
     
 private:
     Ui::qDataStoreWidget *ui;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
     QWebFrame* downloadFrame;
     QWebFrame* uploadFrame;
+    QWebView* DownloadPage;
+    QWebView* UploadPage;
+#else
+    QWebEngineView* DownloadPage;
+    QWebEngineView* UploadPage;
+#endif
     QNetworkAccessManager networkDownloadManager;
     QNetworkAccessManager networkIconManager;
     QNetworkAccessManager networkUploadManager;
@@ -118,8 +140,10 @@ private:
     QString DataSetDir;
     
     void saveDataset(QString fileName);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
     void setDocumentWebkitHidden(QWebFrame* webFrame, bool value);
     QString evalJS(QWebFrame* webFrame, const QString &js);
+#endif
 };
 
 #endif // qDATASTOREGUI_H

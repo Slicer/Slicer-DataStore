@@ -58,15 +58,6 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QWebView" name="DownloadPage">
-         <property name="url">
-          <url>
-           <string>http://10.33.0.107/Midas/Midas3/slicerdatastore</string>
-          </url>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QProgressBar" name="DownloadProgressBar">
          <property name="value">
           <number>24</number>
@@ -81,15 +72,6 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QWebView" name="UploadPage">
-         <property name="url">
-          <url>
-           <string>http://10.33.0.107/Midas/Midas3/slicerdatastore/user/login</string>
-          </url>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QProgressBar" name="UploadProgressBar">
          <property name="value">
           <number>24</number>
@@ -102,13 +84,7 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKit/QWebView</header>
-  </customwidget>
- </customwidgets>
+ <customwidgets/>
  <resources/>
  <connections/>
 </ui>
