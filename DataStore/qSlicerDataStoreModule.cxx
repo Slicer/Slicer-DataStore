@@ -15,9 +15,6 @@
 
 ==============================================================================*/
 
-// Qt includes
-#include <QtPlugin>
-
 // SlicerDataStore Logic includes
 #include <vtkSlicerDataStoreLogic.h>
 
@@ -27,7 +24,11 @@
 #include "qDataStoreWidget.h"
 
 //-----------------------------------------------------------------------------
+#include <QtGlobal>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+#include <QtPlugin>
 Q_EXPORT_PLUGIN2(qSlicerDataStoreModule, qSlicerDataStoreModule);
+#endif
 
 //-----------------------------------------------------------------------------
 /// \ingroup Slicer_QtModules_ExtensionTemplate

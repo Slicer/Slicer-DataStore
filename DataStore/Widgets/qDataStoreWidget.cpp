@@ -24,18 +24,26 @@
 #include "ui_DataStoreButtonBox.h"
 
 //Qt Includes
-#include <QDesktopServices>
-#include <QString>
 #include <QDebug>
-#include <QNetworkRequest>
-#include <QWebFrame>
-#include <QNetworkReply>
-#include <QFileInfo>
+#include <QDesktopServices>
 #include <QDir>
+#include <QFileInfo>
+#include <QString>
+#include <QNetworkRequest>
+#include <QNetworkReply>
 #include <QSettings>
 #include <QTreeWidget>
-#include <QDebug>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QUrlQuery>
+#endif
 #include <QUuid>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+#include <QWebFrame>
+#include <QWebView>
+#else
+#include <QWebEngineSettings>
+#include <QWebEngineView>
+#endif
 
 //Midas includes
 #include <qMidasAPI.h>
@@ -70,11 +78,30 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
                    this, SLOT(deleteDataset(QString)));
   
   ui->setupUi(this);
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+  this->DownloadPage = new QWebView();
+  this->UploadPage = new QWebView();
+#else
+  this->DownloadPage = new QWebEngineView();
+  this->UploadPage = new QWebEngineView();
+#endif
+
+  this->DownloadPage->setUrl(
+        QUrl("http://10.33.0.107/Midas/Midas3/slicerdatastore"));
+  ui->verticalLayout_4->insertWidget(0, this->DownloadPage);
+
+  this->UploadPage->setUrl(
+        QUrl("http://10.33.0.107/Midas/Midas3/slicerdatastore/user/login"));
+  ui->verticalLayout->insertWidget(0, this->UploadPage);
+
   
   ui->tabWidget->setCurrentIndex(1);
-  this->downloadFrame = ui->DownloadPage->page()->mainFrame();
-  this->uploadFrame = ui->UploadPage->page()->mainFrame();
-  
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+  this->downloadFrame = this->DownloadPage->page()->mainFrame();
+  this->uploadFrame = this->UploadPage->page()->mainFrame();
+#endif
+
   //Configure "local dataset" tab
   ui->treeWidget->setColumnCount(qDataStoreWidget::ColumnCount);
   ui->treeWidget->setColumnWidth(qDataStoreWidget::NameColumn, 500);
@@ -105,30 +132,31 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
     dataPath.mkdir(this->DataSetDir);
     }
   
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebSettings::globalSettings();
-  ui->DownloadPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-  ui->UploadPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+  this->DownloadPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+  this->UploadPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
   
-  QObject::connect(ui->DownloadPage, SIGNAL(loadStarted()),
+  QObject::connect(this->DownloadPage, SIGNAL(loadStarted()),
                   this, SLOT(onLoadStarted()));
   
-  QObject::connect(ui->UploadPage, SIGNAL(loadStarted()),
+  QObject::connect(this->UploadPage, SIGNAL(loadStarted()),
                   this, SLOT(onLoadStarted()));
 
-  QObject::connect(ui->DownloadPage, SIGNAL(loadFinished(bool)),
+  QObject::connect(this->DownloadPage, SIGNAL(loadFinished(bool)),
                   this, SLOT(onLoadFinished(bool)));
   
-  QObject::connect(ui->UploadPage, SIGNAL(loadFinished(bool)),
+  QObject::connect(this->UploadPage, SIGNAL(loadFinished(bool)),
                   this, SLOT(onLoadFinished(bool)));
 
-  QObject::connect(ui->DownloadPage, SIGNAL(loadProgress(int)),
+  QObject::connect(this->DownloadPage, SIGNAL(loadProgress(int)),
                   ui->DownloadProgressBar, SLOT(setValue(int)));
   
-  QObject::connect(ui->UploadPage, SIGNAL(loadProgress(int)),
+  QObject::connect(this->UploadPage, SIGNAL(loadProgress(int)),
                   ui->UploadProgressBar, SLOT(setValue(int)));
   
-  ui->DownloadPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-  ui->UploadPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  this->DownloadPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  this->UploadPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
   
   QObject::connect(this->downloadFrame, SIGNAL(javaScriptWindowObjectCleared()),
                   this, SLOT(initJavascript()));
@@ -136,12 +164,17 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
   QObject::connect(this->uploadFrame, SIGNAL(javaScriptWindowObjectCleared()),
                   this, SLOT(initJavascript()));
   
-  QObject::connect(ui->DownloadPage->page(), SIGNAL(linkClicked(QUrl)),
+  QObject::connect(this->DownloadPage->page(), SIGNAL(linkClicked(QUrl)),
                   this, SLOT(onLinkClicked(QUrl)));
   
-  QObject::connect(ui->UploadPage->page(), SIGNAL(linkClicked(QUrl)),
+  QObject::connect(this->UploadPage->page(), SIGNAL(linkClicked(QUrl)),
                   this, SLOT(onLinkClicked(QUrl)));
-   
+#else
+  QWebEngineSettings::globalSettings();
+
+  qDebug() << "qDataStoreWidget::qDataStoreWidget - "
+              "configuration of widget connections not implemented with Qt5";
+#endif
   QObject::connect(&this->networkDownloadManager, SIGNAL(finished(QNetworkReply*)),
                   this, SLOT(downloaded(QNetworkReply*)));
   
@@ -185,13 +218,17 @@ void qDataStoreWidget::deleteTreeItem(QString fileName)
 // --------------------------------------------------------------------------
 void qDataStoreWidget::onLoadStarted()
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebView* webView = dynamic_cast<QWebView*>(sender());
-  if(webView == ui->DownloadPage)
+#else
+  QWebEngineView* webView = dynamic_cast<QWebEngineView*>(sender());
+#endif
+  if(webView == this->DownloadPage)
     {
     ui->DownloadProgressBar->setFormat("%p%");
     ui->DownloadProgressBar->setVisible(true);
     }
-  else if(webView == ui->UploadPage)
+  else if(webView == this->UploadPage)
     {
     ui->UploadProgressBar->setFormat("%p%");
     ui->UploadProgressBar->setVisible(true);
@@ -201,14 +238,17 @@ void qDataStoreWidget::onLoadStarted()
 // --------------------------------------------------------------------------
 void qDataStoreWidget::onLoadFinished(bool ok)
 {
-  //   std::cout << "Load Finished" << std::endl;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebView* webView = dynamic_cast<QWebView*>(sender());
-  if(webView == ui->DownloadPage)
+#else
+  QWebEngineView* webView = dynamic_cast<QWebEngineView*>(sender());
+#endif
+  if(webView == this->DownloadPage)
     {
     ui->DownloadProgressBar->reset();
     ui->DownloadProgressBar->setVisible(false);
     }
-  else if(webView == ui->UploadPage)
+  else if(webView == this->UploadPage)
     {
     ui->UploadProgressBar->reset();
     ui->UploadProgressBar->setVisible(false);
@@ -220,7 +260,11 @@ void qDataStoreWidget::onLoadFinished(bool ok)
 }
 
 // --------------------------------------------------------------------------
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
 void qDataStoreWidget::setFailurePage(QWebView* webView)
+#else
+void qDataStoreWidget::setFailurePage(QWebEngineView* webView)
+#endif
 {
   QString html =
       "<style type='text/css'>"
@@ -249,15 +293,16 @@ void qDataStoreWidget::setFailurePage(QWebView* webView)
 // --------------------------------------------------------------------------
 void qDataStoreWidget::onLinkClicked(const QUrl& url)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebPage* webPage = dynamic_cast<QWebPage*>(sender());
   QWebView* webView;
-  if(webPage == ui->DownloadPage->page())
+  if(webPage == this->DownloadPage->page())
     {
-    webView = ui->DownloadPage;
+    webView = this->DownloadPage;
     }
   else
     {
-    webView = ui->UploadPage;
+    webView = this->UploadPage;
     }
   QUrl serverUrl = webView->url();
   if(url.host() == serverUrl.host())
@@ -271,8 +316,13 @@ void qDataStoreWidget::onLinkClicked(const QUrl& url)
       qWarning() << "Failed to open url:" << url;
       }
     }
+#else
+  qDebug() << "qDataStoreWidget::onLinkClicked" << url
+           << " - not implemented with Qt5";
+#endif
 }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
 // --------------------------------------------------------------------------
 void qDataStoreWidget::setDocumentWebkitHidden(QWebFrame* webFrame, bool value)
 {
@@ -284,6 +334,7 @@ QString qDataStoreWidget::evalJS(QWebFrame* webFrame, const QString &js)
 {
   return webFrame->evaluateJavaScript(js).toString();
 }
+#endif
 
 //---------------------------------------------------------------------------
 void qDataStoreWidget::loadDataset(QString fileName)
@@ -315,8 +366,8 @@ void qDataStoreWidget::loadDataStoreURLs(QString url)
     url += "/";
     }
   url += "slicerdatastore/";
-  ui->DownloadPage->setUrl(QUrl(url));
-  ui->UploadPage->setUrl(QUrl(url+"user/login"));
+  this->DownloadPage->setUrl(QUrl(url));
+  this->UploadPage->setUrl(QUrl(url+"user/login"));
 }
 
 //---------------------------------------------------------------------------
@@ -330,7 +381,11 @@ void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
     {
     QDir().mkdir(this->DataSetDir);
     }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
   QString fileName = qUrl.queryItemValue("name") + ".mrb";
+#else
+  QString fileName = QUrlQuery(qUrl).queryItemValue("name") + ".mrb";
+#endif
   QFile* file = new QFile(this->DataSetDir + fileName);
   if(file->exists())
     {    
@@ -516,18 +571,22 @@ void qDataStoreWidget::displayWindow()
 // --------------------------------------------------------------------------
 void qDataStoreWidget::initJavascript()
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebFrame* webFrame = dynamic_cast<QWebFrame*>(sender());
   bool isVisible = false;
   if(webFrame == this->downloadFrame)
     {
-    isVisible = ui->DownloadPage->isVisible();
+    isVisible = this->DownloadPage->isVisible();
     }
   else if(webFrame == this->uploadFrame)
     {
-    isVisible = ui->UploadPage->isVisible();
+    isVisible = this->UploadPage->isVisible();
     }
   this->setDocumentWebkitHidden(webFrame, !isVisible);
   webFrame->addToJavaScriptWindowObject("DataStoreGUI", this);
+#else
+  qDebug() << "qDataStoreWidget::initJavascript - not implemented with Qt5";
+#endif
 }
 
 // --------------------------------------------------------------------------
