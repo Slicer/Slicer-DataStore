@@ -63,6 +63,7 @@ public:
     }
 };
 
+// --------------------------------------------------------------------------
 qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::qDataStoreWidget)
@@ -525,8 +526,6 @@ void qDataStoreWidget::initJavascript()
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebFrame* webFrame = dynamic_cast<QWebFrame*>(sender());
   webFrame->addToJavaScriptWindowObject("DataStoreGUI", this);
-#else
-  qDebug() << "qDataStoreWidget::initJavascript - not implemented with Qt5";
 #endif
 }
 

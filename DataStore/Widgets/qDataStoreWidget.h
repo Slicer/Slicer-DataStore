@@ -43,8 +43,10 @@ class qSlicerWebWidget;
 
 class QNetworkReply;
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+class QWebChannel;
 class QWebView;
 #else
+#include <QWebChannel>
 class QWebEngineView;
 #endif
 
@@ -116,6 +118,10 @@ protected slots:
   void onLinkClicked(const QUrl& url);
   void initJavascript();
   void displayWindow();
+
+protected:
+  virtual void updateWebChannelScript(QByteArray& webChannelScript);
+  virtual void initializeWebChannel(QWebChannel* webChannel);
     
 private:
     Ui::qDataStoreWidget *ui;
