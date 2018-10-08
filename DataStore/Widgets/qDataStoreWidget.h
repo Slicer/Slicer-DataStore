@@ -36,6 +36,9 @@
 // STD includes
 #include <iostream>
 
+// Slicer includes
+class qSlicerWebWidget;
+
 #include "qSlicerDataStoreModuleExport.h"
 
 class QNetworkReply;
@@ -116,14 +119,11 @@ protected slots:
     
 private:
     Ui::qDataStoreWidget *ui;
+    qSlicerWebWidget* DownloadPage;
+    qSlicerWebWidget* UploadPage;
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
     QWebFrame* downloadFrame;
     QWebFrame* uploadFrame;
-    QWebView* DownloadPage;
-    QWebView* UploadPage;
-#else
-    QWebEngineView* DownloadPage;
-    QWebEngineView* UploadPage;
 #endif
     QNetworkAccessManager networkDownloadManager;
     QNetworkAccessManager networkIconManager;

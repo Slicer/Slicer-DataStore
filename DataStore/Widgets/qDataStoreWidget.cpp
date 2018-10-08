@@ -50,6 +50,7 @@
 
 //Slicer includes
 #include <qSlicerCoreApplication.h>
+#include <qSlicerWebWidget.h>
 
 // --------------------------------------------------------------------------
 class DataStoreButtonBox : public QWidget, public Ui_DataStoreButtonBox
@@ -79,27 +80,22 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
   
   ui->setupUi(this);
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-  this->DownloadPage = new QWebView();
-  this->UploadPage = new QWebView();
-#else
-  this->DownloadPage = new QWebEngineView();
-  this->UploadPage = new QWebEngineView();
-#endif
+  this->DownloadPage = new qSlicerWebWidget();
+  this->UploadPage = new qSlicerWebWidget();
 
-  this->DownloadPage->setUrl(
+  this->DownloadPage->webView()->setUrl(
         QUrl("http://10.33.0.107/Midas/Midas3/slicerdatastore"));
   ui->verticalLayout_4->insertWidget(0, this->DownloadPage);
 
-  this->UploadPage->setUrl(
+  this->UploadPage->webView()->setUrl(
         QUrl("http://10.33.0.107/Midas/Midas3/slicerdatastore/user/login"));
   ui->verticalLayout->insertWidget(0, this->UploadPage);
 
   
   ui->tabWidget->setCurrentIndex(1);
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-  this->downloadFrame = this->DownloadPage->page()->mainFrame();
-  this->uploadFrame = this->UploadPage->page()->mainFrame();
+  this->downloadFrame = this->DownloadPage->webView()->page()->mainFrame();
+  this->uploadFrame = this->UploadPage->webView()->page()->mainFrame();
 #endif
 
   //Configure "local dataset" tab
@@ -134,29 +130,29 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
   
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebSettings::globalSettings();
-  this->DownloadPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-  this->UploadPage->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+  this->DownloadPage->webView()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+  this->UploadPage->webView()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
   
-  QObject::connect(this->DownloadPage, SIGNAL(loadStarted()),
+  QObject::connect(this->DownloadPage->webView(), SIGNAL(loadStarted()),
                   this, SLOT(onLoadStarted()));
   
-  QObject::connect(this->UploadPage, SIGNAL(loadStarted()),
+  QObject::connect(this->UploadPage->webView(), SIGNAL(loadStarted()),
                   this, SLOT(onLoadStarted()));
 
-  QObject::connect(this->DownloadPage, SIGNAL(loadFinished(bool)),
+  QObject::connect(this->DownloadPage->webView(), SIGNAL(loadFinished(bool)),
                   this, SLOT(onLoadFinished(bool)));
   
-  QObject::connect(this->UploadPage, SIGNAL(loadFinished(bool)),
+  QObject::connect(this->UploadPage->webView(), SIGNAL(loadFinished(bool)),
                   this, SLOT(onLoadFinished(bool)));
 
-  QObject::connect(this->DownloadPage, SIGNAL(loadProgress(int)),
+  QObject::connect(this->DownloadPage->webView(), SIGNAL(loadProgress(int)),
                   ui->DownloadProgressBar, SLOT(setValue(int)));
   
-  QObject::connect(this->UploadPage, SIGNAL(loadProgress(int)),
+  QObject::connect(this->UploadPage->webView(), SIGNAL(loadProgress(int)),
                   ui->UploadProgressBar, SLOT(setValue(int)));
   
-  this->DownloadPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-  this->UploadPage->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  this->DownloadPage->webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  this->UploadPage->webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
   
   QObject::connect(this->downloadFrame, SIGNAL(javaScriptWindowObjectCleared()),
                   this, SLOT(initJavascript()));
@@ -164,10 +160,10 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
   QObject::connect(this->uploadFrame, SIGNAL(javaScriptWindowObjectCleared()),
                   this, SLOT(initJavascript()));
   
-  QObject::connect(this->DownloadPage->page(), SIGNAL(linkClicked(QUrl)),
+  QObject::connect(this->DownloadPage->webView()->page(), SIGNAL(linkClicked(QUrl)),
                   this, SLOT(onLinkClicked(QUrl)));
   
-  QObject::connect(this->UploadPage->page(), SIGNAL(linkClicked(QUrl)),
+  QObject::connect(this->UploadPage->webView()->page(), SIGNAL(linkClicked(QUrl)),
                   this, SLOT(onLinkClicked(QUrl)));
 #else
   QWebEngineSettings::globalSettings();
@@ -223,12 +219,12 @@ void qDataStoreWidget::onLoadStarted()
 #else
   QWebEngineView* webView = dynamic_cast<QWebEngineView*>(sender());
 #endif
-  if(webView == this->DownloadPage)
+  if(webView == this->DownloadPage->webView())
     {
     ui->DownloadProgressBar->setFormat("%p%");
     ui->DownloadProgressBar->setVisible(true);
     }
-  else if(webView == this->UploadPage)
+  else if(webView == this->UploadPage->webView())
     {
     ui->UploadProgressBar->setFormat("%p%");
     ui->UploadProgressBar->setVisible(true);
@@ -243,12 +239,12 @@ void qDataStoreWidget::onLoadFinished(bool ok)
 #else
   QWebEngineView* webView = dynamic_cast<QWebEngineView*>(sender());
 #endif
-  if(webView == this->DownloadPage)
+  if(webView == this->DownloadPage->webView())
     {
     ui->DownloadProgressBar->reset();
     ui->DownloadProgressBar->setVisible(false);
     }
-  else if(webView == this->UploadPage)
+  else if(webView == this->UploadPage->webView())
     {
     ui->UploadProgressBar->reset();
     ui->UploadProgressBar->setVisible(false);
@@ -296,13 +292,13 @@ void qDataStoreWidget::onLinkClicked(const QUrl& url)
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebPage* webPage = dynamic_cast<QWebPage*>(sender());
   QWebView* webView;
-  if(webPage == this->DownloadPage->page())
+  if(webPage == this->DownloadPage->webView()->page())
     {
-    webView = this->DownloadPage;
+    webView = this->DownloadPage->webView();
     }
   else
     {
-    webView = this->UploadPage;
+    webView = this->UploadPage->webView();
     }
   QUrl serverUrl = webView->url();
   if(url.host() == serverUrl.host())
@@ -366,8 +362,8 @@ void qDataStoreWidget::loadDataStoreURLs(QString url)
     url += "/";
     }
   url += "slicerdatastore/";
-  this->DownloadPage->setUrl(QUrl(url));
-  this->UploadPage->setUrl(QUrl(url+"user/login"));
+  this->DownloadPage->webView()->setUrl(QUrl(url));
+  this->UploadPage->webView()->setUrl(QUrl(url+"user/login"));
 }
 
 //---------------------------------------------------------------------------
