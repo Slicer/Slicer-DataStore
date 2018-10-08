@@ -144,12 +144,6 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
   
   QObject::connect(this->UploadPage->webView(), SIGNAL(loadFinished(bool)),
                   this, SLOT(onLoadFinished(bool)));
-
-  QObject::connect(this->DownloadPage->webView(), SIGNAL(loadProgress(int)),
-                  ui->DownloadProgressBar, SLOT(setValue(int)));
-  
-  QObject::connect(this->UploadPage->webView(), SIGNAL(loadProgress(int)),
-                  ui->UploadProgressBar, SLOT(setValue(int)));
   
   this->DownloadPage->webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
   this->UploadPage->webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
@@ -214,21 +208,6 @@ void qDataStoreWidget::deleteTreeItem(QString fileName)
 // --------------------------------------------------------------------------
 void qDataStoreWidget::onLoadStarted()
 {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-  QWebView* webView = dynamic_cast<QWebView*>(sender());
-#else
-  QWebEngineView* webView = dynamic_cast<QWebEngineView*>(sender());
-#endif
-  if(webView == this->DownloadPage->webView())
-    {
-    ui->DownloadProgressBar->setFormat("%p%");
-    ui->DownloadProgressBar->setVisible(true);
-    }
-  else if(webView == this->UploadPage->webView())
-    {
-    ui->UploadProgressBar->setFormat("%p%");
-    ui->UploadProgressBar->setVisible(true);
-    }
 }
 
 // --------------------------------------------------------------------------
@@ -239,16 +218,6 @@ void qDataStoreWidget::onLoadFinished(bool ok)
 #else
   QWebEngineView* webView = dynamic_cast<QWebEngineView*>(sender());
 #endif
-  if(webView == this->DownloadPage->webView())
-    {
-    ui->DownloadProgressBar->reset();
-    ui->DownloadProgressBar->setVisible(false);
-    }
-  else if(webView == this->UploadPage->webView())
-    {
-    ui->UploadProgressBar->reset();
-    ui->UploadProgressBar->setVisible(false);
-    }
   if(!ok)
     {
     this->setFailurePage(webView);

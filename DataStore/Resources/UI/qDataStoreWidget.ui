@@ -56,35 +56,18 @@
       <attribute name="title">
        <string>Download Datasets</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
-        <widget class="QProgressBar" name="DownloadProgressBar">
-         <property name="value">
-          <number>24</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <layout class="QVBoxLayout" name="verticalLayout_4"/>
      </widget>
      <widget class="QWidget" name="UploadTab">
       <attribute name="title">
        <string>Upload Datasets</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QProgressBar" name="UploadProgressBar">
-         <property name="value">
-          <number>24</number>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <layout class="QVBoxLayout" name="verticalLayout"/>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
- <customwidgets/>
  <resources/>
  <connections/>
 </ui>
