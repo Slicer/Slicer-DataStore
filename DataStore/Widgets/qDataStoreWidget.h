@@ -140,10 +140,6 @@ private:
     QString DataSetDir;
     
     void saveDataset(QString fileName);
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-    void setDocumentWebkitHidden(QWebFrame* webFrame, bool value);
-    QString evalJS(QWebFrame* webFrame, const QString &js);
-#endif
 };
 
 #endif // qDATASTOREGUI_H

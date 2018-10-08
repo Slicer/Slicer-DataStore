@@ -287,20 +287,6 @@ void qDataStoreWidget::onLinkClicked(const QUrl& url)
 #endif
 }
 
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-// --------------------------------------------------------------------------
-void qDataStoreWidget::setDocumentWebkitHidden(QWebFrame* webFrame, bool value)
-{
-  this->evalJS(webFrame, QString("document.webkitHidden = %1").arg(value ? "true" : "false"));
-}
-
-//---------------------------------------------------------------------------
-QString qDataStoreWidget::evalJS(QWebFrame* webFrame, const QString &js)
-{
-  return webFrame->evaluateJavaScript(js).toString();
-}
-#endif
-
 //---------------------------------------------------------------------------
 void qDataStoreWidget::loadDataset(QString fileName)
 {
@@ -538,16 +524,6 @@ void qDataStoreWidget::initJavascript()
 {
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebFrame* webFrame = dynamic_cast<QWebFrame*>(sender());
-  bool isVisible = false;
-  if(webFrame == this->downloadFrame)
-    {
-    isVisible = this->DownloadPage->isVisible();
-    }
-  else if(webFrame == this->uploadFrame)
-    {
-    isVisible = this->UploadPage->isVisible();
-    }
-  this->setDocumentWebkitHidden(webFrame, !isVisible);
   webFrame->addToJavaScriptWindowObject("DataStoreGUI", this);
 #else
   qDebug() << "qDataStoreWidget::initJavascript - not implemented with Qt5";
