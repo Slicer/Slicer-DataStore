@@ -27,12 +27,14 @@ set(MODULE_SRCS
   Widgets/qSlicer${MODULE_NAME}ModuleWidget.h
   Widgets/qDataStoreWidget.cpp
   Widgets/qDataStoreWidget.h
+  Widgets/qDataStoreWidget_p.h
   )
 
 set(MODULE_MOC_SRCS
   qSlicer${MODULE_NAME}Module.h
   Widgets/qSlicer${MODULE_NAME}ModuleWidget.h
   Widgets/qDataStoreWidget.h
+  Widgets/qDataStoreWidget_p.h
   )
 
 set(MODULE_UI_SRCS

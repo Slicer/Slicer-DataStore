@@ -20,13 +20,12 @@
 #ifndef qDATASTOREGUI_H
 #define qDATASTOREGUI_H
 
+// DataStore includes
+class qDataStoreWidget;
+
 // Qt includes
 #include <QFile>
 #include <QFileInfo>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QSignalMapper>
-#include <QTime>
 #include <QUrl>
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
 #include <QWebFrame>
@@ -37,7 +36,7 @@
 #include <iostream>
 
 // Slicer includes
-class qSlicerWebWidget;
+#include <qSlicerWebWidget.h>
 
 #include "qSlicerDataStoreModuleExport.h"
 
@@ -48,10 +47,32 @@ class QWebView;
 class QWebEngineView;
 #endif
 
-namespace Ui {
-class qDataStoreWidget;
-}
+class qDataStoreWidgetPrivate;
+class qSlicerDataStoreWebWidgetPrivate;
 
+// --------------------------------------------------------------------------
+class Q_SLICER_QTMODULES_DATASTORE_EXPORT qSlicerDataStoreWebWidget : public qSlicerWebWidget
+{
+  friend class qDataStoreWidgetPrivate;
+  Q_OBJECT
+public:
+  typedef qSlicerWebWidget Superclass;
+  explicit qSlicerDataStoreWebWidget(QWidget* parent = 0);
+  virtual ~qSlicerDataStoreWebWidget(){}
+
+  qDataStoreWidget* dataStoreWidget();
+  void setDataStoreWidget(qDataStoreWidget* widget);
+
+protected slots:
+  virtual void initJavascript();
+  virtual void onLoadFinished(bool ok);
+
+private:
+  Q_DECLARE_PRIVATE(qSlicerDataStoreWebWidget);
+  Q_DISABLE_COPY(qSlicerDataStoreWebWidget);
+};
+
+// --------------------------------------------------------------------------
 class Q_SLICER_QTMODULES_DATASTORE_EXPORT qDataStoreWidget : public QWidget
 {
     Q_OBJECT
@@ -59,12 +80,7 @@ class Q_SLICER_QTMODULES_DATASTORE_EXPORT qDataStoreWidget : public QWidget
 public:  
   explicit qDataStoreWidget(QWidget *parent = 0);
   ~qDataStoreWidget();
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-  void setFailurePage(QWebView* webView);
-#else
-  void setFailurePage(QWebEngineView* webView);
-#endif
-  
+
   enum ColumnsIds
   {
   IconColumn = 0,
@@ -111,35 +127,17 @@ signals:
   void ScheduleSave(QString);
     
 protected slots:
-  void onLoadStarted();
-  void onLoadFinished(bool ok);
-  void onLinkClicked(const QUrl& url);
-  void initJavascript();
   void displayWindow();
-    
+
 private:
-    Ui::qDataStoreWidget *ui;
-    qSlicerWebWidget* DownloadPage;
-    qSlicerWebWidget* UploadPage;
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-    QWebFrame* downloadFrame;
-    QWebFrame* uploadFrame;
-#endif
-    QNetworkAccessManager networkDownloadManager;
-    QNetworkAccessManager networkIconManager;
-    QNetworkAccessManager networkUploadManager;
-    QNetworkReply* CurrentReply;
-    QTime StreamTime;
-    QString StreamStat;
-    QFile* StreamedFile;
-    QString StreamId;
-    bool DownloadCanceled;
-    QSignalMapper LoadButtonMapper;
-    QSignalMapper DeleteButtonMapper;
-    
-    QString DataSetDir;
-    
-    void saveDataset(QString fileName);
+  void saveDataset(QString fileName);
+
+protected:
+  QScopedPointer<qDataStoreWidgetPrivate> d_ptr;
+
+private:
+  Q_DECLARE_PRIVATE(qDataStoreWidget)
+  Q_DISABLE_COPY(qDataStoreWidget)
 };
 
 #endif // qDATASTOREGUI_H
