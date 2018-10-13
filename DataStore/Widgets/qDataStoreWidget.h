@@ -23,10 +23,6 @@
 // Qt includes
 #include <QFile>
 #include <QFileInfo>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QSignalMapper>
-#include <QTime>
 #include <QUrl>
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
 #include <QWebFrame>
@@ -43,14 +39,14 @@ class qSlicerWebWidget;
 
 class QNetworkReply;
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+class QWebChannel;
 class QWebView;
 #else
+#include <QWebChannel>
 class QWebEngineView;
 #endif
 
-namespace Ui {
-class qDataStoreWidget;
-}
+class qDataStoreWidgetPrivate;
 
 class Q_SLICER_QTMODULES_DATASTORE_EXPORT qDataStoreWidget : public QWidget
 {
@@ -116,30 +112,16 @@ protected slots:
   void onLinkClicked(const QUrl& url);
   void initJavascript();
   void displayWindow();
-    
+
 private:
-    Ui::qDataStoreWidget *ui;
-    qSlicerWebWidget* DownloadPage;
-    qSlicerWebWidget* UploadPage;
-#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
-    QWebFrame* downloadFrame;
-    QWebFrame* uploadFrame;
-#endif
-    QNetworkAccessManager networkDownloadManager;
-    QNetworkAccessManager networkIconManager;
-    QNetworkAccessManager networkUploadManager;
-    QNetworkReply* CurrentReply;
-    QTime StreamTime;
-    QString StreamStat;
-    QFile* StreamedFile;
-    QString StreamId;
-    bool DownloadCanceled;
-    QSignalMapper LoadButtonMapper;
-    QSignalMapper DeleteButtonMapper;
-    
-    QString DataSetDir;
-    
-    void saveDataset(QString fileName);
+  void saveDataset(QString fileName);
+
+protected:
+  QScopedPointer<qDataStoreWidgetPrivate> d_ptr;
+
+private:
+  Q_DECLARE_PRIVATE(qDataStoreWidget)
+  Q_DISABLE_COPY(qDataStoreWidget)
 };
 
 #endif // qDATASTOREGUI_H

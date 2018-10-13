@@ -29,9 +29,12 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QString>
+#include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QSignalMapper>
 #include <QSettings>
+#include <QTime>
 #include <QTreeWidget>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QUrlQuery>
@@ -63,53 +66,110 @@ public:
     }
 };
 
-qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::qDataStoreWidget)
+// --------------------------------------------------------------------------
+// qDataStoreWidgetPrivate
+
+class qDataStoreWidgetPrivate : public Ui_qDataStoreWidget
 {
+  Q_DECLARE_PUBLIC(qDataStoreWidget)
+protected:
+  qDataStoreWidget* const q_ptr;
+
+public:
+  qDataStoreWidgetPrivate(qDataStoreWidget& object);
+
+  void init();
+
+  qSlicerWebWidget* DownloadPage;
+  qSlicerWebWidget* UploadPage;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
+  QWebFrame* downloadFrame;
+  QWebFrame* uploadFrame;
+#endif
+  QNetworkAccessManager networkDownloadManager;
+  QNetworkAccessManager networkIconManager;
+  QNetworkAccessManager networkUploadManager;
+  QNetworkReply* CurrentReply;
+  QTime StreamTime;
+  QString StreamStat;
+  QFile* StreamedFile;
+  QString StreamId;
+  bool DownloadCanceled;
+  QSignalMapper LoadButtonMapper;
+  QSignalMapper DeleteButtonMapper;
+
+  QString DataSetDir;
+};
+
+// --------------------------------------------------------------------------
+qDataStoreWidgetPrivate::qDataStoreWidgetPrivate(qDataStoreWidget& object)
+  :q_ptr(&object)
+{
+}
+
+// --------------------------------------------------------------------------
+void qDataStoreWidgetPrivate::init()
+{
+  Q_Q(qDataStoreWidget);
+
+  this->setupUi(q);
+
   this->CurrentReply = 0;
   this->StreamedFile = 0;
+
   qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
   this->DataSetDir = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
-  
-  QObject::connect(&this->LoadButtonMapper, SIGNAL(mapped(QString)),
-                   this, SLOT(loadDataset(QString)));
-  
-  QObject::connect(&this->DeleteButtonMapper, SIGNAL(mapped(QString)),
-                   this, SLOT(deleteDataset(QString)));
-  
-  ui->setupUi(this);
 
   this->DownloadPage = new qSlicerWebWidget();
   this->UploadPage = new qSlicerWebWidget();
 
   this->DownloadPage->webView()->setUrl(
         QUrl("http://10.33.0.107/Midas/Midas3/slicerdatastore"));
-  ui->verticalLayout_4->insertWidget(0, this->DownloadPage);
+  this->verticalLayout_4->insertWidget(0, this->DownloadPage);
 
   this->UploadPage->webView()->setUrl(
         QUrl("http://10.33.0.107/Midas/Midas3/slicerdatastore/user/login"));
-  ui->verticalLayout->insertWidget(0, this->UploadPage);
 
-  
-  ui->tabWidget->setCurrentIndex(1);
+  this->verticalLayout->insertWidget(0, this->UploadPage);
+
+  this->tabWidget->setCurrentIndex(1);
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   this->downloadFrame = this->DownloadPage->webView()->page()->mainFrame();
   this->uploadFrame = this->UploadPage->webView()->page()->mainFrame();
 #endif
 
   //Configure "local dataset" tab
-  ui->treeWidget->setColumnCount(qDataStoreWidget::ColumnCount);
-  ui->treeWidget->setColumnWidth(qDataStoreWidget::NameColumn, 500);
-  ui->treeWidget->setHeaderHidden(true);
-  ui->treeWidget->setRootIsDecorated(false);
-  ui->treeWidget->setIconSize(QSize(64, 64));
-  ui->treeWidget->setAllColumnsShowFocus(true);
-  ui->treeWidget->setAlternatingRowColors(true);
-  ui->treeWidget->setSelectionMode(QAbstractItemView::NoSelection);
-  ui->treeWidget->hide();
-  ui->noDatasetMessage->show();
-  QDir dataPath(this->DataSetDir);
+  this->treeWidget->setColumnCount(qDataStoreWidget::ColumnCount);
+  this->treeWidget->setColumnWidth(qDataStoreWidget::NameColumn, 500);
+  this->treeWidget->setHeaderHidden(true);
+  this->treeWidget->setRootIsDecorated(false);
+  this->treeWidget->setIconSize(QSize(64, 64));
+  this->treeWidget->setAllColumnsShowFocus(true);
+  this->treeWidget->setAlternatingRowColors(true);
+  this->treeWidget->setSelectionMode(QAbstractItemView::NoSelection);
+  this->treeWidget->hide();
+  this->noDatasetMessage->show();
+}
+
+// --------------------------------------------------------------------------
+// qDataStoreWidget
+
+// --------------------------------------------------------------------------
+qDataStoreWidget::qDataStoreWidget(QWidget *parent)
+  :
+    QWidget(parent)
+  , d_ptr(new qDataStoreWidgetPrivate(*this))
+{
+  Q_D(qDataStoreWidget);
+  d->init();
+  
+  QObject::connect(&d->LoadButtonMapper, SIGNAL(mapped(QString)),
+                   this, SLOT(loadDataset(QString)));
+  
+  QObject::connect(&d->DeleteButtonMapper, SIGNAL(mapped(QString)),
+                   this, SLOT(deleteDataset(QString)));
+
+  QDir dataPath(d->DataSetDir);
   if(dataPath.exists())
     {
     dataPath.setFilter(QDir::Files);
@@ -125,39 +185,39 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
     }
   else
     {
-    dataPath.mkdir(this->DataSetDir);
+    dataPath.mkdir(d->DataSetDir);
     }
   
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebSettings::globalSettings();
-  this->DownloadPage->webView()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-  this->UploadPage->webView()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+  d->DownloadPage->webView()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+  d->UploadPage->webView()->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
   
-  QObject::connect(this->DownloadPage->webView(), SIGNAL(loadStarted()),
+  QObject::connect(d->DownloadPage->webView(), SIGNAL(loadStarted()),
                   this, SLOT(onLoadStarted()));
   
-  QObject::connect(this->UploadPage->webView(), SIGNAL(loadStarted()),
+  QObject::connect(d->UploadPage->webView(), SIGNAL(loadStarted()),
                   this, SLOT(onLoadStarted()));
 
-  QObject::connect(this->DownloadPage->webView(), SIGNAL(loadFinished(bool)),
+  QObject::connect(d->DownloadPage->webView(), SIGNAL(loadFinished(bool)),
                   this, SLOT(onLoadFinished(bool)));
   
-  QObject::connect(this->UploadPage->webView(), SIGNAL(loadFinished(bool)),
+  QObject::connect(d->UploadPage->webView(), SIGNAL(loadFinished(bool)),
                   this, SLOT(onLoadFinished(bool)));
   
-  this->DownloadPage->webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-  this->UploadPage->webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  d->DownloadPage->webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  d->UploadPage->webView()->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
   
-  QObject::connect(this->downloadFrame, SIGNAL(javaScriptWindowObjectCleared()),
+  QObject::connect(d->downloadFrame, SIGNAL(javaScriptWindowObjectCleared()),
                   this, SLOT(initJavascript()));
   
-  QObject::connect(this->uploadFrame, SIGNAL(javaScriptWindowObjectCleared()),
+  QObject::connect(d->uploadFrame, SIGNAL(javaScriptWindowObjectCleared()),
                   this, SLOT(initJavascript()));
   
-  QObject::connect(this->DownloadPage->webView()->page(), SIGNAL(linkClicked(QUrl)),
+  QObject::connect(d->DownloadPage->webView()->page(), SIGNAL(linkClicked(QUrl)),
                   this, SLOT(onLinkClicked(QUrl)));
   
-  QObject::connect(this->UploadPage->webView()->page(), SIGNAL(linkClicked(QUrl)),
+  QObject::connect(d->UploadPage->webView()->page(), SIGNAL(linkClicked(QUrl)),
                   this, SLOT(onLinkClicked(QUrl)));
 #else
   QWebEngineSettings::globalSettings();
@@ -165,13 +225,13 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
   qDebug() << "qDataStoreWidget::qDataStoreWidget - "
               "configuration of widget connections not implemented with Qt5";
 #endif
-  QObject::connect(&this->networkDownloadManager, SIGNAL(finished(QNetworkReply*)),
+  QObject::connect(&d->networkDownloadManager, SIGNAL(finished(QNetworkReply*)),
                   this, SLOT(downloaded(QNetworkReply*)));
   
-  QObject::connect(&this->networkIconManager, SIGNAL(finished(QNetworkReply*)),
+  QObject::connect(&d->networkIconManager, SIGNAL(finished(QNetworkReply*)),
                   this, SLOT(iconDownloaded(QNetworkReply*)));
   
-  QObject::connect(&this->networkUploadManager, SIGNAL(finished(QNetworkReply*)),
+  QObject::connect(&d->networkUploadManager, SIGNAL(finished(QNetworkReply*)),
                   this, SLOT(uploaded(QNetworkReply*)));
     
 }
@@ -179,30 +239,34 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent) :
 // --------------------------------------------------------------------------
 void qDataStoreWidget::addNewTreeItem(QFileInfo fileName)
 {
-  ui->treeWidget->show();
-  ui->noDatasetMessage->hide();
+  Q_D(qDataStoreWidget);
+
+  d->treeWidget->show();
+  d->noDatasetMessage->hide();
   QTreeWidgetItem* item = new QTreeWidgetItem();
-  ui->treeWidget->addTopLevelItem(item);
+  d->treeWidget->addTopLevelItem(item);
   
   item->setText(qDataStoreWidget::NameColumn, fileName.fileName());
   item->setIcon(qDataStoreWidget::IconColumn,
-                QIcon(this->DataSetDir + fileName.baseName() + ".jpeg"));
+                QIcon(d->DataSetDir + fileName.baseName() + ".jpeg"));
 
   DataStoreButtonBox* buttonBox = new DataStoreButtonBox();
-  ui->treeWidget->setItemWidget(item, qDataStoreWidget::ButtonsColumn, buttonBox);
-  this->LoadButtonMapper.setMapping(buttonBox->LoadButton, fileName.fileName());
-  QObject::connect(buttonBox->LoadButton, SIGNAL(clicked()), &this->LoadButtonMapper, SLOT(map()));
-  this->DeleteButtonMapper.setMapping(buttonBox->DeleteButton, fileName.fileName());
-  QObject::connect(buttonBox->DeleteButton, SIGNAL(clicked()), &this->DeleteButtonMapper, SLOT(map()));
+  d->treeWidget->setItemWidget(item, qDataStoreWidget::ButtonsColumn, buttonBox);
+  d->LoadButtonMapper.setMapping(buttonBox->LoadButton, fileName.fileName());
+  QObject::connect(buttonBox->LoadButton, SIGNAL(clicked()), &d->LoadButtonMapper, SLOT(map()));
+  d->DeleteButtonMapper.setMapping(buttonBox->DeleteButton, fileName.fileName());
+  QObject::connect(buttonBox->DeleteButton, SIGNAL(clicked()), &d->DeleteButtonMapper, SLOT(map()));
 }
 
 // --------------------------------------------------------------------------
 void qDataStoreWidget::deleteTreeItem(QString fileName)
 {
-  QList<QTreeWidgetItem*> items = ui->treeWidget->findItems(fileName, Qt::MatchExactly, qDataStoreWidget::NameColumn);
+  Q_D(qDataStoreWidget);
+
+  QList<QTreeWidgetItem*> items = d->treeWidget->findItems(fileName, Qt::MatchExactly, qDataStoreWidget::NameColumn);
   QTreeWidgetItem* item = items.at(0);
-  ui->treeWidget->setCurrentItem(item);
-  delete ui->treeWidget->takeTopLevelItem(ui->treeWidget->currentIndex().row());
+  d->treeWidget->setCurrentItem(item);
+  delete d->treeWidget->takeTopLevelItem(d->treeWidget->currentIndex().row());
 }
 
 // --------------------------------------------------------------------------
@@ -290,7 +354,8 @@ void qDataStoreWidget::onLinkClicked(const QUrl& url)
 //---------------------------------------------------------------------------
 void qDataStoreWidget::loadDataset(QString fileName)
 {
-  emit ScheduleLoad(this->DataSetDir + fileName);
+  Q_D(qDataStoreWidget);
+  emit ScheduleLoad(d->DataSetDir + fileName);
   this->hide();
 }
 
@@ -303,109 +368,114 @@ void qDataStoreWidget::saveDataset(QString fileName)
 //---------------------------------------------------------------------------
 void qDataStoreWidget::deleteDataset(QString fileName)
 {
-  QFileInfo fileInfo(this->DataSetDir + fileName);
-  QFile::remove(this->DataSetDir + fileName); //DataSet
-  QFile::remove(this->DataSetDir + fileInfo.baseName() + ".jpeg"); //Icon
+  Q_D(qDataStoreWidget);
+  QFileInfo fileInfo(d->DataSetDir + fileName);
+  QFile::remove(d->DataSetDir + fileName); //DataSet
+  QFile::remove(d->DataSetDir + fileInfo.baseName() + ".jpeg"); //Icon
   this->deleteTreeItem(fileName);
 }
 
 //---------------------------------------------------------------------------
 void qDataStoreWidget::loadDataStoreURLs(QString url)
 {
+  Q_D(qDataStoreWidget);
   if(url.at(url.size()-1) != '/')
     {
     url += "/";
     }
   url += "slicerdatastore/";
-  this->DownloadPage->webView()->setUrl(QUrl(url));
-  this->UploadPage->webView()->setUrl(QUrl(url+"user/login"));
+  d->DownloadPage->webView()->setUrl(QUrl(url));
+  d->UploadPage->webView()->setUrl(QUrl(url+"user/login"));
 }
 
 //---------------------------------------------------------------------------
 void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
 {
-  this->DownloadCanceled = false;
+  Q_D(qDataStoreWidget);
+  d->DownloadCanceled = false;
   QUrl qUrl = QUrl(url);
   QUrl iconUrl = QUrl(thumbnail);
   
-  if(!QDir(this->DataSetDir).exists())
+  if(!QDir(d->DataSetDir).exists())
     {
-    QDir().mkdir(this->DataSetDir);
+    QDir().mkdir(d->DataSetDir);
     }
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
   QString fileName = qUrl.queryItemValue("name") + ".mrb";
 #else
   QString fileName = QUrlQuery(qUrl).queryItemValue("name") + ".mrb";
 #endif
-  QFile* file = new QFile(this->DataSetDir + fileName);
+  QFile* file = new QFile(d->DataSetDir + fileName);
   if(file->exists())
     {    
     //The file was already downloaded so we just load it
     this->loadDataset(fileName);
-    this->StreamStat="-1";
+    d->StreamStat="-1";
     this->hide();
     delete file;
     return;
     }
   
-  this->CurrentReply = this->networkDownloadManager.post(QNetworkRequest(qUrl), QByteArray());
-  if(this->CurrentReply->error() != QNetworkReply::NoError)
+  d->CurrentReply = d->networkDownloadManager.post(QNetworkRequest(qUrl), QByteArray());
+  if(d->CurrentReply->error() != QNetworkReply::NoError)
     {
-    qWarning() << "Network error. Unable to download file:" << this->CurrentReply->error();
+    qWarning() << "Network error. Unable to download file:" << d->CurrentReply->error();
     }
-  QObject::connect(this->CurrentReply, SIGNAL(downloadProgress(qint64,qint64)),
+  QObject::connect(d->CurrentReply, SIGNAL(downloadProgress(qint64,qint64)),
           this, SLOT(onStreamProgress(qint64,qint64)));
-  this->networkIconManager.get(QNetworkRequest(iconUrl));
-  this->StreamTime.start();
-  this->StreamStat="0;;Speed: 0 B/s";
+  d->networkIconManager.get(QNetworkRequest(iconUrl));
+  d->StreamTime.start();
+  d->StreamStat="0;;Speed: 0 B/s";
   
-  if(this->StreamedFile)
+  if(d->StreamedFile)
     {
-    delete this->StreamedFile;
-    this->StreamedFile = 0;
+    delete d->StreamedFile;
+    d->StreamedFile = 0;
     }
-  this->StreamedFile = file;
+  d->StreamedFile = file;
 }
 
 //---------------------------------------------------------------------------
 void qDataStoreWidget::upload(const QString& url)
 {
+  Q_D(qDataStoreWidget);
   QString completeUrl = url;
   QString name = QUuid::createUuid().toString();
   this->saveDataset(QDir::tempPath() + "/" + name + ".mrb");
-  if(this->StreamedFile)
+  if(d->StreamedFile)
     {
-    delete this->StreamedFile;
-    this->StreamedFile = 0;
+    delete d->StreamedFile;
+    d->StreamedFile = 0;
     }
-  this->StreamedFile = new QFile(QDir::tempPath() + "/" + name + ".mrb");
-  if(this->StreamedFile->open(QIODevice::ReadOnly))
+  d->StreamedFile = new QFile(QDir::tempPath() + "/" + name + ".mrb");
+  if(d->StreamedFile->open(QIODevice::ReadOnly))
     {
-    completeUrl += QString::number(this->StreamedFile->size());
+    completeUrl += QString::number(d->StreamedFile->size());
     QUrl qUrl = QUrl(completeUrl);
       
     QNetworkRequest request(qUrl);
-    this->CurrentReply = this->networkUploadManager.put(request, this->StreamedFile);    
-    if(this->CurrentReply->error() != QNetworkReply::NoError)
+    d->CurrentReply = d->networkUploadManager.put(request, d->StreamedFile);
+    if(d->CurrentReply->error() != QNetworkReply::NoError)
       {
-      qWarning() << "Network error. Unable to upload file:" << this->CurrentReply->error();
+      qWarning() << "Network error. Unable to upload file:" << d->CurrentReply->error();
       }
-    QObject::connect(this->CurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
+    QObject::connect(d->CurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
             this, SLOT(onStreamProgress(qint64,qint64)));
     
-    this->StreamTime.start();
-    this->StreamStat="0;;Speed: 0 B/s";
+    d->StreamTime.start();
+    d->StreamStat="0;;Speed: 0 B/s";
     }
   else
     {
-    this->StreamStat="-1";
+    d->StreamStat="-1";
     }
 }
 
 //---------------------------------------------------------------------------
 void qDataStoreWidget::onStreamProgress(qint64 bytes, qint64 bytesTotal)
 {
-  double speed = bytes * 1000.0 / this->StreamTime.elapsed();
+  Q_D(qDataStoreWidget);
+  double speed = bytes * 1000.0 / d->StreamTime.elapsed();
   QString unit;
   if (speed < 1024)
     {
@@ -421,24 +491,27 @@ void qDataStoreWidget::onStreamProgress(qint64 bytes, qint64 bytesTotal)
     unit = " MB/s";
     }
   
-  this->StreamStat = QString::number(100.0*(double)bytes/(double)bytesTotal, 'f', 1)
+  d->StreamStat = QString::number(100.0*(double)bytes/(double)bytesTotal, 'f', 1)
                        + ";;Speed: " + QString::number(speed, 'f', 2) + unit;
 }
 
 //---------------------------------------------------------------------------
 QString qDataStoreWidget::getStreamStat()
 {
-//   std::cout << "Dl progress " << this->StreamStat.toStdString() << std::endl;
-  return this->StreamStat;
+  Q_D(qDataStoreWidget);
+//   std::cout << "Dl progress " << d->StreamStat.toStdString() << std::endl;
+  return d->StreamStat;
 }
 
 //---------------------------------------------------------------------------
 QString qDataStoreWidget::getDownloadedItems()
 {
+  Q_D(qDataStoreWidget);
+
   QString items;
-  for(int i = 0; i < ui->treeWidget->topLevelItemCount(); i++)
+  for(int i = 0; i < d->treeWidget->topLevelItemCount(); i++)
     {
-    QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
+    QTreeWidgetItem* item = d->treeWidget->topLevelItem(i);
     QString Id = item->text(qDataStoreWidget::NameColumn).section('_', 0, 0);
     items += Id + ";;";
     }
@@ -448,54 +521,57 @@ QString qDataStoreWidget::getDownloadedItems()
 //---------------------------------------------------------------------------
 void qDataStoreWidget::downloaded(QNetworkReply* reply)
 {
+  Q_D(qDataStoreWidget);
   if(reply->error() != QNetworkReply::NoError)
     { 
     qWarning() << "Network error. Unable to download file:" << reply->error();
     }
-  if(!this->DownloadCanceled)
+  if(!d->DownloadCanceled)
     {
     QByteArray data = reply->readAll();
     
-    if(!this->StreamedFile->open(QIODevice::WriteOnly))
+    if(!d->StreamedFile->open(QIODevice::WriteOnly))
       {
-      delete this->StreamedFile;
-      this->StreamedFile = 0;
+      delete d->StreamedFile;
+      d->StreamedFile = 0;
       return;
       }
-    this->StreamedFile->write(data);
-    this->StreamedFile->close();
+    d->StreamedFile->write(data);
+    d->StreamedFile->close();
     
-    QFileInfo fileInfo(this->StreamedFile->fileName());
+    QFileInfo fileInfo(d->StreamedFile->fileName());
     this->addNewTreeItem(fileInfo);
     this->loadDataset(fileInfo.fileName());
     
-    delete this->StreamedFile;
-    this->StreamedFile = 0;
+    delete d->StreamedFile;
+    d->StreamedFile = 0;
     
     this->hide();
     }
   
-  this->StreamStat = "-1"; //For the webpage to know dl is finished
+  d->StreamStat = "-1"; //For the webpage to know dl is finished
   reply->deleteLater();
-  this->CurrentReply = 0;
+  d->CurrentReply = 0;
 }
 
 //---------------------------------------------------------------------------
 void qDataStoreWidget::uploaded(QNetworkReply* reply)
-{  
-  this->StreamedFile->remove();
-  delete this->StreamedFile;
-  this->StreamedFile = 0;
-  this->StreamStat = "-1"; //For the webpage to know dl is finished
+{
+  Q_D(qDataStoreWidget);
+  d->StreamedFile->remove();
+  delete d->StreamedFile;
+  d->StreamedFile = 0;
+  d->StreamStat = "-1"; //For the webpage to know dl is finished
   reply->deleteLater();
 }
 
 //---------------------------------------------------------------------------
 void qDataStoreWidget::iconDownloaded(QNetworkReply* reply)
 {
+  Q_D(qDataStoreWidget);
   QByteArray data = reply->readAll();
-  QFileInfo fileInfo(this->StreamedFile->fileName());
-  QFile file(this->DataSetDir + fileInfo.baseName() + ".jpeg");
+  QFileInfo fileInfo(d->StreamedFile->fileName());
+  QFile file(d->DataSetDir + fileInfo.baseName() + ".jpeg");
   file.open(QIODevice::WriteOnly);
   file.write(data);
   file.close();
@@ -505,11 +581,12 @@ void qDataStoreWidget::iconDownloaded(QNetworkReply* reply)
 //Abort network reply and call downloaded slot
 void qDataStoreWidget::cancelDownload()
 {
+  Q_D(qDataStoreWidget);
 //   std::cout << "Cancel DL" << std::endl;
-  if(this->CurrentReply)
+  if(d->CurrentReply)
     {
-    this->DownloadCanceled = true;
-    this->CurrentReply->abort(); //Send finished signal
+    d->DownloadCanceled = true;
+    d->CurrentReply->abort(); //Send finished signal
     }
 }
 
@@ -519,19 +596,17 @@ void qDataStoreWidget::displayWindow()
   this->show();
   this->raise();
 }
+
 // --------------------------------------------------------------------------
 void qDataStoreWidget::initJavascript()
 {
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
   QWebFrame* webFrame = dynamic_cast<QWebFrame*>(sender());
   webFrame->addToJavaScriptWindowObject("DataStoreGUI", this);
-#else
-  qDebug() << "qDataStoreWidget::initJavascript - not implemented with Qt5";
 #endif
 }
 
 // --------------------------------------------------------------------------
 qDataStoreWidget::~qDataStoreWidget()
 {
-  delete ui;
 }
