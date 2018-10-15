@@ -39,7 +39,7 @@ class Q_SLICER_QTMODULES_DATASTORE_EXPORT qSlicerDataStoreModuleWidget :
 public:
 
   typedef qSlicerAbstractModuleWidget Superclass;
-  qSlicerDataStoreModuleWidget(QWidget *parent=0);
+  explicit qSlicerDataStoreModuleWidget(QWidget *parent=0);
   virtual ~qSlicerDataStoreModuleWidget();
   virtual void enter();
 

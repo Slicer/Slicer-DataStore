@@ -23,24 +23,17 @@ set(MODULE_INCLUDE_DIRECTORIES
 set(MODULE_SRCS
   qSlicer${MODULE_NAME}Module.cxx
   qSlicer${MODULE_NAME}Module.h
-  Widgets/qSlicer${MODULE_NAME}ModuleWidget.cxx
-  Widgets/qSlicer${MODULE_NAME}ModuleWidget.h
-  Widgets/qDataStoreWidget.cpp
-  Widgets/qDataStoreWidget.h
-  Widgets/qDataStoreWidget_p.h
+  qSlicer${MODULE_NAME}ModuleWidget.cxx
+  qSlicer${MODULE_NAME}ModuleWidget.h
   )
 
 set(MODULE_MOC_SRCS
   qSlicer${MODULE_NAME}Module.h
-  Widgets/qSlicer${MODULE_NAME}ModuleWidget.h
-  Widgets/qDataStoreWidget.h
-  Widgets/qDataStoreWidget_p.h
+  qSlicer${MODULE_NAME}ModuleWidget.h
   )
 
 set(MODULE_UI_SRCS
   Resources/UI/qSlicer${MODULE_NAME}ModuleWidget.ui
-  Resources/UI/qDataStoreWidget.ui
-  Resources/UI/DataStoreButtonBox.ui
   )
 
 set(MODULE_TARGET_LIBRARIES

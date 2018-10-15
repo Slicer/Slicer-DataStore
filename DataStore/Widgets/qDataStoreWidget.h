@@ -17,8 +17,8 @@
 
 // .NAME qDataStoreWidget - Manage the main module's UI
 
-#ifndef qDATASTOREGUI_H
-#define qDATASTOREGUI_H
+#ifndef qDataStoreWidget_h
+#define qDataStoreWidget_h
 
 // DataStore includes
 class qDataStoreWidget;
@@ -38,7 +38,7 @@ class qDataStoreWidget;
 // Slicer includes
 #include <qSlicerWebWidget.h>
 
-#include "qSlicerDataStoreModuleExport.h"
+#include "qSlicerDataStoreModuleWidgetsExport.h"
 
 class QNetworkReply;
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
@@ -51,7 +51,7 @@ class qDataStoreWidgetPrivate;
 class qSlicerDataStoreWebWidgetPrivate;
 
 // --------------------------------------------------------------------------
-class Q_SLICER_QTMODULES_DATASTORE_EXPORT qSlicerDataStoreWebWidget : public qSlicerWebWidget
+class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qSlicerDataStoreWebWidget : public qSlicerWebWidget
 {
   friend class qDataStoreWidgetPrivate;
   Q_OBJECT
@@ -73,13 +73,13 @@ private:
 };
 
 // --------------------------------------------------------------------------
-class Q_SLICER_QTMODULES_DATASTORE_EXPORT qDataStoreWidget : public QWidget
+class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qDataStoreWidget : public QWidget
 {
     Q_OBJECT
     
 public:  
   explicit qDataStoreWidget(QWidget *parent = 0);
-  ~qDataStoreWidget();
+  virtual ~qDataStoreWidget();
 
   enum ColumnsIds
   {

@@ -8,16 +8,23 @@ set(${KIT}_INCLUDE_DIRECTORIES
   )
 
 set(${KIT}_SRCS
+  qDataStoreWidget.cpp
+  qDataStoreWidget.h
+  qDataStoreWidget_p.h
   qSlicer${MODULE_NAME}Widget.cxx
   qSlicer${MODULE_NAME}Widget.h
   )
 
 set(${KIT}_MOC_SRCS
+  qDataStoreWidget.h
+  qDataStoreWidget_p.h
   qSlicer${MODULE_NAME}Widget.h
   )
 
 set(${KIT}_UI_SRCS
-  ../Resources/UI/qSlicer${MODULE_NAME}Widget.ui
+  Resources/UI/DataStoreButtonBox.ui
+  Resources/UI/qDataStoreWidget.ui
+  Resources/UI/qSlicer${MODULE_NAME}Widget.ui
   )
 
 set(${KIT}_TARGET_LIBRARIES

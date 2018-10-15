@@ -20,12 +20,14 @@ class QWebChannel;
 #include <QWebChannel>
 #endif
 
+#include "qSlicerDataStoreModuleWidgetsExport.h"
+
 // --------------------------------------------------------------------------
-class qSlicerDataStoreWidgetWebChannelProxy : public QObject
+class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qSlicerDataStoreWidgetWebChannelProxy : public QObject
 {
   Q_OBJECT
 public:
-  qSlicerDataStoreWidgetWebChannelProxy() : DataStoreWidget(0){}
+  explicit qSlicerDataStoreWidgetWebChannelProxy() : DataStoreWidget(0){}
   qDataStoreWidget* DataStoreWidget;
 public slots:
   void download(const QString& url, const QString& thumbnail);
@@ -36,7 +38,7 @@ private:
 };
 
 // --------------------------------------------------------------------------
-class qSlicerDataStoreWebWidgetPrivate  : public qSlicerWebWidgetPrivate
+class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qSlicerDataStoreWebWidgetPrivate  : public qSlicerWebWidgetPrivate
 {
   Q_DECLARE_PUBLIC(qSlicerDataStoreWebWidget);
 protected:
@@ -44,7 +46,7 @@ protected:
 
 public:
   typedef qSlicerWebWidgetPrivate Superclass;
-  qSlicerDataStoreWebWidgetPrivate(qSlicerDataStoreWebWidget& object) :
+  explicit qSlicerDataStoreWebWidgetPrivate(qSlicerDataStoreWebWidget& object) :
     Superclass(object), q_ptr(&object), DataStoreWidgetWebChannelProxy(new qSlicerDataStoreWidgetWebChannelProxy) {}
   virtual ~qSlicerDataStoreWebWidgetPrivate()
   {
@@ -57,10 +59,12 @@ public:
   void setFailurePage();
 
   qSlicerDataStoreWidgetWebChannelProxy* DataStoreWidgetWebChannelProxy;
+private:
+  Q_DISABLE_COPY(qSlicerDataStoreWebWidgetPrivate);
 };
 
 // --------------------------------------------------------------------------
-class qDataStoreWidgetPrivate : public Ui_qDataStoreWidget
+class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qDataStoreWidgetPrivate : public Ui_qDataStoreWidget
 {
   Q_DECLARE_PUBLIC(qDataStoreWidget)
 protected:
@@ -88,6 +92,8 @@ public:
   QSignalMapper DeleteButtonMapper;
 
   QString DataSetDir;
+private:
+  Q_DISABLE_COPY(qDataStoreWidgetPrivate);
 };
 
 #endif
