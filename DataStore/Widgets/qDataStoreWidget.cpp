@@ -154,15 +154,11 @@ void qSlicerDataStoreWebWidget::onLoadFinished(bool ok)
 // qSlicerDataStoreWebWidgetPrivate
 
 // --------------------------------------------------------------------------
-void qSlicerDataStoreWebWidgetPrivate::updateWebChannelScript(QByteArray& webChannelScript)
+void qSlicerDataStoreWebWidgetPrivate::initializeWebChannelTransport(QByteArray& webChannelScript)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-  webChannelScript.append(
-      "\n"
-      "new QWebChannel(qt.webChannelTransport, function(channel) {"
-      " window.DataStoreGUI = channel.objects.DataStoreGUI;"
-      "});"
-      );
+  this->Superclass::initializeWebChannelTransport(webChannelScript);
+  webChannelScript.append(" window.DataStoreGUI = channel.objects.DataStoreGUI;\n");
 #else
   Q_UNUSED(webChannelScript);
 #endif

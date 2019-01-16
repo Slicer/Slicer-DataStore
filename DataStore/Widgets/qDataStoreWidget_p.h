@@ -53,7 +53,7 @@ public:
     delete this->DataStoreWidgetWebChannelProxy;
   }
 
-  virtual void updateWebChannelScript(QByteArray& webChannelScript);
+  virtual void initializeWebChannelTransport(QByteArray& webChannelScript);
   virtual void initializeWebChannel(QWebChannel* webChannel);
 
   void setFailurePage();
