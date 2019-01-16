@@ -173,6 +173,7 @@ void qSlicerDataStoreWebWidgetPrivate::initializeWebChannel(QWebChannel* webChan
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
   Q_Q(qSlicerDataStoreWebWidget);
+  this->Superclass::initializeWebChannel(webChannel);
   webChannel->registerObject("DataStoreGUI", this->DataStoreWidgetWebChannelProxy);
 #else
   Q_UNUSED(webChannel);
