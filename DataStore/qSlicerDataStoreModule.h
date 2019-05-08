@@ -42,7 +42,7 @@ qSlicerDataStoreModule
 public:
 
   typedef qSlicerLoadableModule Superclass;
-  explicit qSlicerDataStoreModule(QObject *parent=0);
+  explicit qSlicerDataStoreModule(QObject *parent=nullptr);
   ~qSlicerDataStoreModule() override;
 
   qSlicerGetTitleMacro(QTMODULE_TITLE);

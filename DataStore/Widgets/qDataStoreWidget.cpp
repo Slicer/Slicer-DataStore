@@ -168,7 +168,6 @@ void qSlicerDataStoreWebWidgetPrivate::initializeWebChannelTransport(QByteArray&
 void qSlicerDataStoreWebWidgetPrivate::initializeWebChannel(QWebChannel* webChannel)
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-  Q_Q(qSlicerDataStoreWebWidget);
   this->Superclass::initializeWebChannel(webChannel);
   webChannel->registerObject("DataStoreGUI", this->DataStoreWidgetWebChannelProxy);
 #else
@@ -220,8 +219,8 @@ void qDataStoreWidgetPrivate::init()
 
   this->setupUi(q);
 
-  this->CurrentReply = 0;
-  this->StreamedFile = 0;
+  this->CurrentReply = nullptr;
+  this->StreamedFile = nullptr;
 
   qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
   this->DataSetDir = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
@@ -412,7 +411,7 @@ void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
   if(d->StreamedFile)
     {
     delete d->StreamedFile;
-    d->StreamedFile = 0;
+    d->StreamedFile = nullptr;
     }
   d->StreamedFile = file;
 }
@@ -427,7 +426,7 @@ void qDataStoreWidget::upload(const QString& url)
   if(d->StreamedFile)
     {
     delete d->StreamedFile;
-    d->StreamedFile = 0;
+    d->StreamedFile = nullptr;
     }
   d->StreamedFile = new QFile(QDir::tempPath() + "/" + name + ".mrb");
   if(d->StreamedFile->open(QIODevice::ReadOnly))
@@ -515,7 +514,7 @@ void qDataStoreWidget::downloaded(QNetworkReply* reply)
     if(!d->StreamedFile->open(QIODevice::WriteOnly))
       {
       delete d->StreamedFile;
-      d->StreamedFile = 0;
+      d->StreamedFile = nullptr;
       return;
       }
     d->StreamedFile->write(data);
@@ -526,14 +525,14 @@ void qDataStoreWidget::downloaded(QNetworkReply* reply)
     this->loadDataset(fileInfo.fileName());
     
     delete d->StreamedFile;
-    d->StreamedFile = 0;
+    d->StreamedFile = nullptr;
     
     this->hide();
     }
   
   d->StreamStat = "-1"; //For the webpage to know dl is finished
   reply->deleteLater();
-  d->CurrentReply = 0;
+  d->CurrentReply = nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -542,7 +541,7 @@ void qDataStoreWidget::uploaded(QNetworkReply* reply)
   Q_D(qDataStoreWidget);
   d->StreamedFile->remove();
   delete d->StreamedFile;
-  d->StreamedFile = 0;
+  d->StreamedFile = nullptr;
   d->StreamStat = "-1"; //For the webpage to know dl is finished
   reply->deleteLater();
 }

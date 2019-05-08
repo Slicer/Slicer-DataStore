@@ -57,7 +57,7 @@ class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qSlicerDataStoreWebWidget : publi
   Q_OBJECT
 public:
   typedef qSlicerWebWidget Superclass;
-  explicit qSlicerDataStoreWebWidget(QWidget* parent = 0);
+  explicit qSlicerDataStoreWebWidget(QWidget* parent = nullptr);
   ~qSlicerDataStoreWebWidget() override {}
 
   qDataStoreWidget* dataStoreWidget();

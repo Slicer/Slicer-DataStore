@@ -101,7 +101,7 @@ void qSlicerDataStoreModuleWidget::setup()
   d->setupUi(this);
   
   this->Module = dynamic_cast<qSlicerDataStoreModule*>(this->module());
-  this->DataStoreWindow = 0;
+  this->DataStoreWindow = nullptr;
   
   this->Superclass::setup();
 }

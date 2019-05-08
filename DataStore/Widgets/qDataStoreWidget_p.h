@@ -27,7 +27,7 @@ class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qSlicerDataStoreWidgetWebChannelP
 {
   Q_OBJECT
 public:
-  explicit qSlicerDataStoreWidgetWebChannelProxy() : DataStoreWidget(0){}
+  explicit qSlicerDataStoreWidgetWebChannelProxy() : DataStoreWidget(nullptr){}
   qDataStoreWidget* DataStoreWidget;
 public slots:
   void download(const QString& url, const QString& thumbnail);
