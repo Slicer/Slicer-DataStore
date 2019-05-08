@@ -67,11 +67,11 @@ qSlicerDataStoreWidget
 {
   Q_D(qSlicerDataStoreWidget);
   d->setupUi(this);
-  
+
   qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
   QString dirPath  = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
   QSettings settings (dirPath + "settings.ini", QSettings::IniFormat);
-  
+
   QString url = settings.value("datastore/serverUrl").toString();
   if(!url.isEmpty())
     {
@@ -83,7 +83,7 @@ qSlicerDataStoreWidget
     }
 
   this->PreviousUrl = d->DataStoreUrl->text();
-  
+
   QObject::connect(d->DisplayButton, SIGNAL(clicked()),
                      this, SLOT(onDisplayButtonClicked()));
   QObject::connect(d->DataStoreUrl, SIGNAL(editingFinished()),
@@ -101,7 +101,7 @@ void qSlicerDataStoreWidget::onUrlModified()
 {
   Q_D(qSlicerDataStoreWidget);
   if(d->DataStoreUrl->text() != this->PreviousUrl)
-    {     
+    {
     emit UrlModified(d->DataStoreUrl->text());
     this->PreviousUrl = d->DataStoreUrl->text();
     qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();

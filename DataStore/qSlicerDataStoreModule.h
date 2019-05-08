@@ -55,7 +55,7 @@ public:
 
   QStringList categories()const override;
   QStringList dependencies() const override;
-  
+
 public slots:
   void LoadScene(QString MRMLFilePath);
   void SaveScene(QString fileName);
@@ -76,7 +76,7 @@ protected:
 
 private:
   vtkSlicerDataStoreLogic* Logic;
-  
+
   Q_DECLARE_PRIVATE(qSlicerDataStoreModule);
   Q_DISABLE_COPY(qSlicerDataStoreModule);
 

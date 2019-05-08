@@ -4,5 +4,5 @@ How to install the Slicer Data Store :
   -Edit > Application Settings
   -Add an additional module path : path/to/build/lib/Slicer-4.2/qt-loadable-modules
   -Restart Slicer
-  
+
 The new module will appear in the all module list as DataStore

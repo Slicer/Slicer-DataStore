@@ -46,14 +46,14 @@ protected slots:
 signals:
   void DisplayButtonClicked();
   void UrlModified(QString);
-  
+
 
 protected:
   QScopedPointer<qSlicerDataStoreWidgetPrivate> d_ptr;
 
 private:
   QString PreviousUrl;
-  
+
   Q_DECLARE_PRIVATE(qSlicerDataStoreWidget);
   Q_DISABLE_COPY(qSlicerDataStoreWidget);
 };

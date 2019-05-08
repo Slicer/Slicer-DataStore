@@ -56,7 +56,7 @@ qSlicerDataStoreModule
   : Superclass(_parent)
   , d_ptr(new qSlicerDataStoreModulePrivate)
 {
-      
+
 }
 
 //-----------------------------------------------------------------------------

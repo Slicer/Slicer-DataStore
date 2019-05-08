@@ -76,8 +76,8 @@ private:
 class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qDataStoreWidget : public QWidget
 {
     Q_OBJECT
-    
-public:  
+
+public:
   explicit qDataStoreWidget(QWidget *parent = 0);
   virtual ~qDataStoreWidget();
 
@@ -88,13 +88,13 @@ public:
   ButtonsColumn,
   ColumnCount
   };
-  
+
   // Add a new element in the Local datasets list
   void addNewTreeItem(QFileInfo fileName);
-  
+
   // Remove a new element in the Local datasets list
   void deleteTreeItem(QString fileName);
-    
+
 public slots:
   //Save data as a file
   void downloaded(QNetworkReply* reply);
@@ -110,7 +110,7 @@ public slots:
   void deleteDataset(QString fileName);
   // Set the WebViews url
   void loadDataStoreURLs(QString);
-  
+
   // Start the download of a dataset and its thumbnail
   void download(const QString& url, const QString& thumbnail);
   // Upload the current dataset to the selected URL
@@ -121,11 +121,11 @@ public slots:
   QString getStreamStat();
   // Return the list of the downloaded items
   QString getDownloadedItems();
-  
+
 signals:
   void ScheduleLoad(QString);
   void ScheduleSave(QString);
-    
+
 protected slots:
   void displayWindow();
 

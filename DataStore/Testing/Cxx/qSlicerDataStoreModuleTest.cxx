@@ -40,11 +40,11 @@
 #include "qSlicerDataStoreModuleWidget.h"
 
 int qSlicerDataStoreModuleTest(int argc, char * argv [] )
-{  
+{
   // Initialize Tests.
   qSlicerApplication app(argc, argv);
   qSlicerDataStoreModule module;
-  module.initialize(0);  
+  module.initialize(0);
   qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
   QString dataSetDir = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
   QString filename = dataSetDir + QString("qSlicerDataStoreModuleTest.mrb");
@@ -53,17 +53,17 @@ int qSlicerDataStoreModuleTest(int argc, char * argv [] )
     {
     file.remove(filename);
     }
-  
+
   // Load the WebView
   qDataStoreWidget* webWidget = new qDataStoreWidget();
   webWidget->loadDataStoreURLs(QString("http://slicer.kitware.com/midas3"));
   webWidget->show();
-  
+
   QString downloadUrl("http://www.slicer.org/img/3DSlicerLogo-H-Color-218x144.png");
-    
+
   // Test if we can cancel a download
   webWidget->download(downloadUrl, downloadUrl);
-  webWidget->cancelDownload();    
+  webWidget->cancelDownload();
 
   // Test if we can and remove a dataset from the local cache.
   int numberDonwloadItems = webWidget->getDownloadedItems().split(";;").size();
@@ -73,32 +73,32 @@ int qSlicerDataStoreModuleTest(int argc, char * argv [] )
     stream << "qSlicerDataStoreModuleTest" << endl;
     }
   file.close();
-  
+
   QFileInfo fileInfo(filename);
   webWidget->addNewTreeItem(fileInfo);
-  
+
   int numberNewListDonwloadItems = webWidget->getDownloadedItems().split(";;").size();
   if((numberDonwloadItems + 1) != numberNewListDonwloadItems)
     {
     std::cerr << "The method getDownloadedItems doesn't work."  << std::endl;
     return EXIT_FAILURE;
     }
-  
+
   if(file.exists(filename))
     {
     file.remove(filename);
     }
-  
+
   // Test the initialization of the default widgets.
   vtkNew<vtkSlicerDataStoreLogic> logic;
   vtkNew<vtkMRMLScene> scene;
-  logic->SetMRMLScene(scene.GetPointer());  
+  logic->SetMRMLScene(scene.GetPointer());
   module.setMRMLScene(scene.GetPointer());
   dynamic_cast<QWidget*>(module.widgetRepresentation())->show();
   dynamic_cast<qSlicerDataStoreModuleWidget*>(module.widgetRepresentation())->enter();
   dynamic_cast<qSlicerDataStoreModuleWidget*>(module.widgetRepresentation())->exit();
   QTimer::singleShot(500, &app, SLOT(quit()));
-  
+
   return app.exec();
 }
 

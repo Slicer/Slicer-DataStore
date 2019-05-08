@@ -43,10 +43,10 @@ int vtkSlicerDataStoreLogicTest(int argc, char * argv [] )
     std::cerr << "Problem with the application() singleton" << std::endl;
     return EXIT_FAILURE;
     }
-  
+
   vtkSlicerDataStoreLogic* logic = vtkSlicerDataStoreLogic::New();
   vtkNew<vtkMRMLScene> scene;
-  logic->SetMRMLScene(scene.GetPointer());  
+  logic->SetMRMLScene(scene.GetPointer());
   logic->LoadMRMLScene(QString(argv[1]));
   logic->Delete();
 

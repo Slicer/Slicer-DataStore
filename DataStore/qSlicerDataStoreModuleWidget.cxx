@@ -64,7 +64,7 @@ qSlicerDataStoreModuleWidget::~qSlicerDataStoreModuleWidget()
 void qSlicerDataStoreModuleWidget::enter()
 {
   Q_D(qSlicerDataStoreModuleWidget);
-  
+
   if(!this->DataStoreWindow)
     {
     this->DataStoreWindow = new qDataStoreWidget();
@@ -76,12 +76,12 @@ void qSlicerDataStoreModuleWidget::enter()
                      this->Module, SLOT(LoadScene(QString)));
     QObject::connect(this->DataStoreWindow, SIGNAL(ScheduleSave(QString)),
                      this->Module, SLOT(SaveScene(QString)));
-    
+
     qSlicerCoreApplication * coreApp = qSlicerCoreApplication::application();
     QString dirPath = 	QFileInfo(coreApp->userSettings()->fileName()).absoluteDir().path() + QString("/DataStore/");
     QSettings settings (dirPath + "settings.ini",
                     QSettings::IniFormat);
-  
+
     QString url = settings.value("datastore/serverUrl").toString();
     if(url.isEmpty())
       {
@@ -90,7 +90,7 @@ void qSlicerDataStoreModuleWidget::enter()
     this->DataStoreWindow->loadDataStoreURLs(url);
     }
   this->DataStoreWindow->show();
-  
+
   this->Superclass::enter();
 }
 
@@ -99,10 +99,10 @@ void qSlicerDataStoreModuleWidget::setup()
 {
   Q_D(qSlicerDataStoreModuleWidget);
   d->setupUi(this);
-  
+
   this->Module = dynamic_cast<qSlicerDataStoreModule*>(this->module());
   this->DataStoreWindow = nullptr;
-  
+
   this->Superclass::setup();
 }
 

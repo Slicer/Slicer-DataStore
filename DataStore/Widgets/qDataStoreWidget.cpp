@@ -289,10 +289,10 @@ qDataStoreWidget::qDataStoreWidget(QWidget *parent)
 
   QObject::connect(&d->networkDownloadManager, SIGNAL(finished(QNetworkReply*)),
                   this, SLOT(downloaded(QNetworkReply*)));
-  
+
   QObject::connect(&d->networkIconManager, SIGNAL(finished(QNetworkReply*)),
                   this, SLOT(iconDownloaded(QNetworkReply*)));
-  
+
   QObject::connect(&d->networkUploadManager, SIGNAL(finished(QNetworkReply*)),
                   this, SLOT(uploaded(QNetworkReply*)));
 }
@@ -306,7 +306,7 @@ void qDataStoreWidget::addNewTreeItem(QFileInfo fileName)
   d->noDatasetMessage->hide();
   QTreeWidgetItem* item = new QTreeWidgetItem();
   d->treeWidget->addTopLevelItem(item);
-  
+
   item->setText(qDataStoreWidget::NameColumn, fileName.fileName());
   item->setIcon(qDataStoreWidget::IconColumn,
                 QIcon(d->DataSetDir + fileName.baseName() + ".jpeg"));
@@ -376,7 +376,7 @@ void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
   d->DownloadCanceled = false;
   QUrl qUrl = QUrl(url);
   QUrl iconUrl = QUrl(thumbnail);
-  
+
   if(!QDir(d->DataSetDir).exists())
     {
     QDir().mkdir(d->DataSetDir);
@@ -388,7 +388,7 @@ void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
 #endif
   QFile* file = new QFile(d->DataSetDir + fileName);
   if(file->exists())
-    {    
+    {
     //The file was already downloaded so we just load it
     this->loadDataset(fileName);
     d->StreamStat="-1";
@@ -396,7 +396,7 @@ void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
     delete file;
     return;
     }
-  
+
   d->CurrentReply = d->networkDownloadManager.post(QNetworkRequest(qUrl), QByteArray());
   if(d->CurrentReply->error() != QNetworkReply::NoError)
     {
@@ -407,7 +407,7 @@ void qDataStoreWidget::download(const QString &url, const QString& thumbnail)
   d->networkIconManager.get(QNetworkRequest(iconUrl));
   d->StreamTime.start();
   d->StreamStat="0;;Speed: 0 B/s";
-  
+
   if(d->StreamedFile)
     {
     delete d->StreamedFile;
@@ -433,7 +433,7 @@ void qDataStoreWidget::upload(const QString& url)
     {
     completeUrl += QString::number(d->StreamedFile->size());
     QUrl qUrl = QUrl(completeUrl);
-      
+
     QNetworkRequest request(qUrl);
     d->CurrentReply = d->networkUploadManager.put(request, d->StreamedFile);
     if(d->CurrentReply->error() != QNetworkReply::NoError)
@@ -442,7 +442,7 @@ void qDataStoreWidget::upload(const QString& url)
       }
     QObject::connect(d->CurrentReply, SIGNAL(uploadProgress(qint64,qint64)),
             this, SLOT(onStreamProgress(qint64,qint64)));
-    
+
     d->StreamTime.start();
     d->StreamStat="0;;Speed: 0 B/s";
     }
@@ -471,7 +471,7 @@ void qDataStoreWidget::onStreamProgress(qint64 bytes, qint64 bytesTotal)
     speed /= 1024*1024;
     unit = " MB/s";
     }
-  
+
   d->StreamStat = QString::number(100.0*(double)bytes/(double)bytesTotal, 'f', 1)
                        + ";;Speed: " + QString::number(speed, 'f', 2) + unit;
 }
@@ -504,13 +504,13 @@ void qDataStoreWidget::downloaded(QNetworkReply* reply)
 {
   Q_D(qDataStoreWidget);
   if(reply->error() != QNetworkReply::NoError)
-    { 
+    {
     qWarning() << "Network error. Unable to download file:" << reply->error();
     }
   if(!d->DownloadCanceled)
     {
     QByteArray data = reply->readAll();
-    
+
     if(!d->StreamedFile->open(QIODevice::WriteOnly))
       {
       delete d->StreamedFile;
@@ -519,17 +519,17 @@ void qDataStoreWidget::downloaded(QNetworkReply* reply)
       }
     d->StreamedFile->write(data);
     d->StreamedFile->close();
-    
+
     QFileInfo fileInfo(d->StreamedFile->fileName());
     this->addNewTreeItem(fileInfo);
     this->loadDataset(fileInfo.fileName());
-    
+
     delete d->StreamedFile;
     d->StreamedFile = nullptr;
-    
+
     this->hide();
     }
-  
+
   d->StreamStat = "-1"; //For the webpage to know dl is finished
   reply->deleteLater();
   d->CurrentReply = nullptr;

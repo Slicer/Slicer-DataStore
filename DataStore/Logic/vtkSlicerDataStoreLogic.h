@@ -49,10 +49,10 @@ public:
   static vtkSlicerDataStoreLogic *New();
   vtkTypeMacro(vtkSlicerDataStoreLogic, vtkSlicerModuleLogic);
   void PrintSelf(ostream& os, vtkIndent indent) override;
-  
+
   // Load a MRML File.
   void LoadMRMLScene(QString mrmlFilePath);
-  
+
   // Save the current Scene
   void SaveMRMLScene(QString fileName);
 
@@ -61,7 +61,7 @@ protected:
   ~vtkSlicerDataStoreLogic() override;
 
   void SetMRMLSceneInternal(vtkMRMLScene* newScene) override;
-  
+
   /// Register MRML Node classes to Scene. Gets called automatically when the MRMLScene is attached to this logic class.
   void RegisterNodes() override;
   void UpdateFromMRMLScene() override;

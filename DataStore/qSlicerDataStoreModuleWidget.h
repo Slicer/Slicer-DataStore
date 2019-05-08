@@ -48,13 +48,13 @@ public slots:
 
 protected:
   QScopedPointer<qSlicerDataStoreModuleWidgetPrivate> d_ptr;
-  
+
   void setup() override;
 
 private:
   Q_DECLARE_PRIVATE(qSlicerDataStoreModuleWidget);
   Q_DISABLE_COPY(qSlicerDataStoreModuleWidget);
-  
+
   qDataStoreWidget* DataStoreWindow;
   qSlicerDataStoreModule* Module;
 };
