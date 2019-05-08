@@ -69,8 +69,8 @@ protected:
   void OnMRMLSceneNodeRemoved(vtkMRMLNode* node) override;
 private:
 
-  vtkSlicerDataStoreLogic(const vtkSlicerDataStoreLogic&); // Not implemented
-  void operator=(const vtkSlicerDataStoreLogic&);               // Not implemented
+  vtkSlicerDataStoreLogic(const vtkSlicerDataStoreLogic&) = delete;
+  void operator=(const vtkSlicerDataStoreLogic&) = delete;
 };
 
 #endif
