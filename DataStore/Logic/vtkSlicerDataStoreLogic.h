@@ -48,7 +48,7 @@ public:
 
   static vtkSlicerDataStoreLogic *New();
   vtkTypeMacro(vtkSlicerDataStoreLogic, vtkSlicerModuleLogic);
-  void PrintSelf(ostream& os, vtkIndent indent) VTK_OVERRIDE;
+  void PrintSelf(ostream& os, vtkIndent indent) override;
   
   // Load a MRML File.
   void LoadMRMLScene(QString mrmlFilePath);
@@ -58,15 +58,15 @@ public:
 
 protected:
   vtkSlicerDataStoreLogic();
-  virtual ~vtkSlicerDataStoreLogic();
+  ~vtkSlicerDataStoreLogic() override;
 
-  virtual void SetMRMLSceneInternal(vtkMRMLScene* newScene) VTK_OVERRIDE;
+  void SetMRMLSceneInternal(vtkMRMLScene* newScene) override;
   
   /// Register MRML Node classes to Scene. Gets called automatically when the MRMLScene is attached to this logic class.
-  virtual void RegisterNodes() VTK_OVERRIDE;
-  virtual void UpdateFromMRMLScene() VTK_OVERRIDE;
-  virtual void OnMRMLSceneNodeAdded(vtkMRMLNode* node) VTK_OVERRIDE;
-  virtual void OnMRMLSceneNodeRemoved(vtkMRMLNode* node) VTK_OVERRIDE;
+  void RegisterNodes() override;
+  void UpdateFromMRMLScene() override;
+  void OnMRMLSceneNodeAdded(vtkMRMLNode* node) override;
+  void OnMRMLSceneNodeRemoved(vtkMRMLNode* node) override;
 private:
 
   vtkSlicerDataStoreLogic(const vtkSlicerDataStoreLogic&); // Not implemented

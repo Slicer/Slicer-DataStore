@@ -37,6 +37,7 @@ protected:
 public:
   qSlicerDataStoreWidgetPrivate(
     qSlicerDataStoreWidget& object);
+  virtual ~qSlicerDataStoreWidgetPrivate() {}
   virtual void setupUi(qSlicerDataStoreWidget*);
 };
 

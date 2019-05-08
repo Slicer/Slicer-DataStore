@@ -40,8 +40,8 @@ public:
 
   typedef qSlicerAbstractModuleWidget Superclass;
   explicit qSlicerDataStoreModuleWidget(QWidget *parent=0);
-  virtual ~qSlicerDataStoreModuleWidget();
-  virtual void enter();
+  ~qSlicerDataStoreModuleWidget() override;
+  void enter() override;
 
 public slots:
 
@@ -49,7 +49,7 @@ public slots:
 protected:
   QScopedPointer<qSlicerDataStoreModuleWidgetPrivate> d_ptr;
   
-  virtual void setup();
+  void setup() override;
 
 private:
   Q_DECLARE_PRIVATE(qSlicerDataStoreModuleWidget);

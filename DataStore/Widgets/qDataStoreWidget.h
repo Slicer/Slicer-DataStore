@@ -58,14 +58,14 @@ class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qSlicerDataStoreWebWidget : publi
 public:
   typedef qSlicerWebWidget Superclass;
   explicit qSlicerDataStoreWebWidget(QWidget* parent = 0);
-  virtual ~qSlicerDataStoreWebWidget(){}
+  ~qSlicerDataStoreWebWidget() override {}
 
   qDataStoreWidget* dataStoreWidget();
   void setDataStoreWidget(qDataStoreWidget* widget);
 
 protected slots:
-  virtual void initJavascript();
-  virtual void onLoadFinished(bool ok);
+  void initJavascript() override;
+  void onLoadFinished(bool ok) override;
 
 private:
   Q_DECLARE_PRIVATE(qSlicerDataStoreWebWidget);

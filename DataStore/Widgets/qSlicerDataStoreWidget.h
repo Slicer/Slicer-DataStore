@@ -37,7 +37,7 @@ class Q_SLICER_MODULE_DATASTORE_WIDGETS_EXPORT qSlicerDataStoreWidget
 public:
   typedef QWidget Superclass;
   explicit qSlicerDataStoreWidget(QWidget *parent=0);
-  virtual ~qSlicerDataStoreWidget();
+  ~qSlicerDataStoreWidget() override;
 
 protected slots:
   void onDisplayButtonClicked();
