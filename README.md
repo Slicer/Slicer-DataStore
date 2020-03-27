@@ -1,5 +1,20 @@
 # DataStore
 
+## Acknowledgments 
+
+The Slicer Data Store was hosted by Kitware using Midas Platform.
+
+This work was supported by NIH Grant 3P41RR013218-12S1, NA-MIC, NAC, and the Slicer community.
+
+## Contributors
+
+* Jean-Christophe Fillion-Robin
+* Charles Marion
+* Jean-Baptiste Berger
+* Hina Shah
+* Pablo Hernandez-Cerdan
+* Steve Pieper
+
 ## History
 
 In 2013, this Slicer module called "Data Store" was created. It allowed to easily
