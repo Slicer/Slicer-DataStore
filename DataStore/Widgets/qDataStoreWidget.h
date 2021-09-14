@@ -67,6 +67,9 @@ protected slots:
   void initJavascript() override;
   void onLoadFinished(bool ok) override;
 
+protected:
+  void changeEvent(QEvent *e);
+
 private:
   Q_DECLARE_PRIVATE(qSlicerDataStoreWebWidget);
   Q_DISABLE_COPY(qSlicerDataStoreWebWidget);

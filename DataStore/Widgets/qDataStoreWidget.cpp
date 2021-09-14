@@ -148,6 +148,25 @@ void qSlicerDataStoreWebWidget::onLoadFinished(bool ok)
     {
     d->setFailurePage();
     }
+  if (ok)
+    {
+    d->updateTheme();
+    }
+}
+
+// --------------------------------------------------------------------------
+void qSlicerDataStoreWebWidget::changeEvent(QEvent *e)
+{
+  Q_D(qSlicerDataStoreWebWidget);
+  switch (e->type())
+    {
+    case QEvent::StyleChange:
+      d->updateTheme();
+    break;
+    default:
+    break;
+    }
+  this->Superclass::changeEvent(e);
 }
 
 // --------------------------------------------------------------------------
@@ -201,6 +220,20 @@ void qSlicerDataStoreWebWidgetPrivate::setFailurePage()
       "</div>";
 
   q->webView()->setHtml(html.arg(q->webView()->url().toString()));
+}
+
+// --------------------------------------------------------------------------
+void qSlicerDataStoreWebWidgetPrivate::updateTheme()
+{
+  Q_Q(qSlicerDataStoreWebWidget);
+  this->setDarkThemeEnabled(q->style()->objectName().compare("Dark Slicer", Qt::CaseInsensitive) == 0);
+}
+
+// --------------------------------------------------------------------------
+void qSlicerDataStoreWebWidgetPrivate::setDarkThemeEnabled(bool enabled)
+{
+  Q_Q(qSlicerDataStoreWebWidget);
+  q->evalJS(QString("app.$vuetify.theme.dark = %1;").arg(enabled ? "true" : "false"));
 }
 
 // --------------------------------------------------------------------------

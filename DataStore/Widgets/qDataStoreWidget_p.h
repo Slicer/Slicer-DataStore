@@ -56,6 +56,9 @@ public:
   virtual void initializeWebChannelTransport(QByteArray& webChannelScript);
   virtual void initializeWebChannel(QWebChannel* webChannel);
 
+  void setDarkThemeEnabled(bool enabled);
+  void updateTheme();
+
   void setFailurePage();
 
   qSlicerDataStoreWidgetWebChannelProxy* DataStoreWidgetWebChannelProxy;
