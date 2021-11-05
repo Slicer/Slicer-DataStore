@@ -68,7 +68,7 @@ protected slots:
   void onLoadFinished(bool ok) override;
 
 protected:
-  void changeEvent(QEvent *e);
+  void changeEvent(QEvent *e) override;
 
 private:
   Q_DECLARE_PRIVATE(qSlicerDataStoreWebWidget);
