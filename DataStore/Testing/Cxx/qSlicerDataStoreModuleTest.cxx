@@ -22,6 +22,9 @@
 #include <qSlicerAbstractModuleRepresentation.h>
 #include <qSlicerApplication.h>
 
+// CTK includes
+#include <ctkUtils.h>
+
 // Qt includes
 #include <QDir>
 #include <QFile>
@@ -70,7 +73,7 @@ int qSlicerDataStoreModuleTest(int argc, char * argv [] )
   if(file.open(QIODevice::ReadWrite) )
     {
     QTextStream stream( &file );
-    stream << "qSlicerDataStoreModuleTest" << endl;
+    stream << "qSlicerDataStoreModuleTest" << ctk::endl;
     }
   file.close();
 
