@@ -14,6 +14,9 @@ class qSlicerDataStoreWebWidget;
 #include <QFile>
 #include <QObject>
 #include <QSignalMapper>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+#include <QElapsedTimer>
+#endif
 #if (QT_VERSION < QT_VERSION_CHECK(5, 6, 0))
 class QWebChannel;
 #else
@@ -85,7 +88,12 @@ public:
   QNetworkAccessManager networkIconManager;
   QNetworkAccessManager networkUploadManager;
   QNetworkReply* CurrentReply;
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+  QElapsedTimer StreamTime;
+#else
   QTime StreamTime;
+#endif
   QString StreamStat;
   QFile* StreamedFile;
   QString StreamId;
